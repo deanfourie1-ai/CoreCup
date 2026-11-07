@@ -6,6 +6,8 @@ export interface Rng {
   next(): number;
   /** An integer from 1 to `sides`, inclusive. */
   die(sides?: number): number;
+  /** The current internal state; `createRng(state)` continues from here. */
+  state(): number;
 }
 
 export function createRng(seed: number): Rng {
@@ -20,5 +22,6 @@ export function createRng(seed: number): Rng {
   return {
     next,
     die: (sides = 6) => 1 + Math.floor(next() * sides),
+    state: () => state,
   };
 }

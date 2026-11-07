@@ -2,11 +2,28 @@
 
 export type Role = 'Keeper' | 'Defender' | 'Midfielder' | 'Striker';
 
+export interface PlayerStats {
+  speed: number;
+  power: number;
+  control: number;
+  reflex: number;
+}
+
 export interface PlayerDef {
   name: string;
   role: Role;
   core: string;
+  /** Leave out to use the role's starting stats. */
+  stats?: PlayerStats;
 }
+
+/** Starting stats per role (1 to 5). First draft, to tune in playtests. */
+export const ROLE_STATS: Record<Role, PlayerStats> = {
+  Keeper: { speed: 2, power: 2, control: 2, reflex: 4 },
+  Defender: { speed: 3, power: 3, control: 2, reflex: 3 },
+  Midfielder: { speed: 3, power: 2, control: 4, reflex: 2 },
+  Striker: { speed: 3, power: 4, control: 3, reflex: 2 },
+};
 
 export interface ClubDef {
   id: string;

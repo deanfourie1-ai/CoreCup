@@ -34,3 +34,12 @@ describe('dice pools', () => {
     expect(after.hits).toBeGreaterThanOrEqual(2);
   });
 });
+
+describe('rng state', () => {
+  it('continues the same sequence from a saved state', () => {
+    const a = createRng(9);
+    a.die();
+    const resumed = createRng(a.state());
+    expect(resumed.die()).toBe(a.die());
+  });
+});

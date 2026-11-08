@@ -30,4 +30,5 @@ Then open the address it prints (usually http://localhost:5173).
   - `rules.ts` holds every tunable number (costs, flight times, match length), so playtests can change values without touching the engine.
   - Matches are seeded, so the same seed and coaches replay the same match.
 - `src/data/` holds game data such as clubs and players.
-- Everything else in `src/` is the screen.
+- `src/game/` connects the engine to a person: it pauses a step when the engine needs your answer (a reaction or a corner) and replays it once you answer.
+- `src/ui/` is the placeholder board: the hex pitch, the timeline track, action buttons and pop-ups. It will be reskinned once the art direction is final.

@@ -3,6 +3,7 @@ import { createSimpleAI } from './ai';
 import type { Hex } from './hex';
 import { activeRobot, ballHolder, legalActions, playMatch, robotById, shotOutcome, step } from './match';
 import type { Rng } from './rng';
+import { RULES } from './rules';
 import { createMatch } from './setup';
 import type { Action, Controller, Controllers, Corner, MatchState, ReactionKind } from './types';
 
@@ -194,10 +195,25 @@ describe('tackles and challenges', () => {
     expect(robotById(s, 'away-1').tick).toBe(3);
   });
 
-  it('knocks the ball loose 1 hex on a tie', () => {
-    // Scatter die 1 for Away points West.
-    const s = step(duel(0), both(idle, coach({ actions: [tackle] })), dice(6, 1, 1, 6, 1, 1, 1));
-    expect(s.ball).toEqual({ state: 'loose', at: hex(5, 4) });
+  it('pushes the robot that lost the ball 2 ticks down the track', () => {
+    const s = step(duel(0), both(idle, coach({ actions: [tackle] })), dice(6, 6, 1, 6, 1, 1));
+    expect(robotById(s, 'home-4').tick).toBe(7);
+  });
+
+  it('leaves the ball with the carrier on a tie', () => {
+    const s = step(duel(0), both(idle, coach({ actions: [tackle] })), dice(6, 1, 1, 6, 1, 1));
+    expect(ballHolder(s)?.id).toBe('home-4');
+  });
+
+  it('can knock the ball loose on a tie when that rule is switched on', () => {
+    RULES.tackleTie = 'loose';
+    try {
+      // Scatter die 1 for Away points West.
+      const s = step(duel(0), both(idle, coach({ actions: [tackle] })), dice(6, 1, 1, 6, 1, 1, 1));
+      expect(s.ball).toEqual({ state: 'loose', at: hex(5, 4) });
+    } finally {
+      RULES.tackleTie = 'carrier';
+    }
   });
 
   it('lets a nearby defender Challenge a carrier mid-move', () => {

@@ -13,7 +13,7 @@ export const RULES = {
     pass: 3,
     shoot: 4,
     tackle: 3,
-    hold: 1,
+    hold: 2,
     intercept: 2,
     challenge: 2,
     block: 2,
@@ -54,11 +54,11 @@ export const RULES = {
   keeperOutsideAreaPenalty: -1,
 
   /**
-   * Proposed by the rules playtest (not yet in the design doc). Defaults match
-   * the doc today; flip them to try the fix pack.
+   * The playtest fix pack, adopted 2026-11-08: a tied tackle or Challenge leaves
+   * the ball with the carrier, and losing the ball costs extra ticks.
    */
-  tackleTie: 'loose' as 'loose' | 'carrier',
+  tackleTie: 'carrier' as 'loose' | 'carrier',
   /** Extra ticks for a robot that loses the ball to a tackle or Challenge. */
-  lostBallDelay: 0,
+  lostBallDelay: 2,
   overheatTicks: 12,
 };

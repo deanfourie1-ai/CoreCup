@@ -4,7 +4,8 @@
 // decoy hexes, who reacts and whether a swap happens, and this plays it back.
 //
 //   Spark     one decoy: a pink hex marker and a translucent ghost of her on it
-//   Surge     the decoy pulls two reactions: the two nearest players turn to it
+//   Surge     not designed yet; plays as Spark. (The lure of the two nearest players is
+//             kept for Ascended only, as a look test, not a rule.)
 //   Ascended  two decoys, then she swaps places with one in a foxfire streak
 //
 // Timeline (seconds after the cast): 0-0.6 focus (foxfire gathers around her),
@@ -18,7 +19,7 @@ import type { Tier } from '../sprites/loadout';
 import { HEX_R, hexToWorld } from './pitch';
 import type { SpritePlayer } from './player';
 
-export const MIRAGE_TIER_NAMES = ['Spark', 'Spark', 'Surge', 'Ascended'] as const;
+export const MIRAGE_TIER_NAMES = ['Spark', 'Spark', 'Surge (not designed yet, shown as Spark)', 'Ascended'] as const;
 
 const FOCUS = 0.6;
 const FLY = 0.25;
@@ -112,7 +113,7 @@ export class FoxMirage {
     if (!this.released && t >= FOCUS + FLY * 0.6) {
       this.released = true;
       this.onRelease?.();
-      if (this.tier >= 2) this.lureNearest(2);
+      if (this.tier >= 3) this.lureNearest(2);
     }
 
     // Decoys: marker and ghost fade in on release, flicker, dissolve upwards at the end.

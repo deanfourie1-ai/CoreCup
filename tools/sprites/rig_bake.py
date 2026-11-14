@@ -117,13 +117,26 @@ class Rig:
         else:
             T["hair"] = T["head"]
         for sd in SIDES:
-            # Arms: forward kinematics from the guide's angle changes.
             sh = rot(J[f"shoulder_{sd}"], J["waist"], lean, waist)
-            a1 = ang(g[f"shoulder_{sd}"], g[f"elbow_{sd}"]) - ang(g0[f"shoulder_{sd}"], g0[f"elbow_{sd}"])
+            # Arms: a flat cut-out arm can't foreshorten, so instead of the 3D guide arms we use
+            # screen-space angles: upper arm hangs and swings +-SWING against the same-side leg,
+            # forearm bends towards the direction of travel. Idle relaxes the painted A-pose.
+            travel = 1 if math.cos(math.radians(G.FACINGS[self.facing])) >= 0 else -1
+            if action == "run":
+                phase = (i + (0 if sd == "R" else 4)) / 8 * 2 * math.pi
+                # Same-side foot forward at phase 0, so this arm swings back then.
+                up = math.pi / 2 + travel * math.radians(28) * math.cos(phase)
+                fore = up - travel * math.radians(80)
+            else:
+                spread = math.radians(12) * (1 if J[f"elbow_{sd}"][0] > J[f"shoulder_{sd}"][0] else -1)
+                up = math.pi / 2 - spread + math.radians(1.5) * math.sin(i / 4 * 2 * math.pi)
+                fore = up - travel * math.radians(12)
+            a1 = up - ang(J[f"shoulder_{sd}"], J[f"elbow_{sd}"])
             T[f"upperarm_{sd}"] = (J[f"shoulder_{sd}"], a1, sh)
             el = rot(J[f"elbow_{sd}"], J[f"shoulder_{sd}"], a1, sh)
-            a2 = ang(g[f"elbow_{sd}"], g[f"hand_{sd}"]) - ang(g0[f"elbow_{sd}"], g0[f"hand_{sd}"])
-            T[f"forearm_{sd}"] = (J[f"elbow_{sd}"], a2, el)  # a2 is already an absolute change
+            wrist = J.get(f"wrist_{sd}") or J[f"hand_{sd}"]
+            a2 = fore - ang(J[f"elbow_{sd}"], wrist)
+            T[f"forearm_{sd}"] = (J[f"elbow_{sd}"], a2, el)
             # Legs: IK so the ankle lands exactly where the guide's foot is.
             hip = (J[f"hip_{sd}"][0] + hm[0] - self.hipmid[0], J[f"hip_{sd}"][1] + hm[1] - self.hipmid[1])
             ankle = moved(f"ankle_{sd}", f"heel_{sd}")

@@ -47,8 +47,10 @@ Timing is "on twos" anime style; the fps below is the playback rate.
 | Stop to idle transition | `run_to_idle` | 2 | 12 | no | |
 
 Run cycle rules:
-- The contact foot stays planted on the same pixel across its stance frames. The game moves the sprite at
-  ground speed and needs a planted foot to look right.
+- Draw the run "on the spot", like a treadmill. The game moves the sprite forward at ground speed, so a
+  foot on the ground must slide **backwards** in the image by the same amount each frame:
+  `stride_px / 8` px per frame (about 47 px at 380). Then it stays still on the pitch. Each foot is on the
+  ground for about 3 of the 8 frames. `tools/sprites/make_pose_guides.py` draws guide poses with this timing.
 - Tell us the **stride length in pixels**: how far one foot travels along the ground in one full cycle of
   two strides. Aim for a cycle of about 380 px (one hex is about 265 px wide at frame scale).
 

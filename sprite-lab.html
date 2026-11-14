@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Core Cup Sprite Lab</title>
+  </head>
+  <body class="lab">
+    <main class="lab-layout">
+      <section class="pitch-wrap">
+        <header class="lab-head">
+          <div>
+            <h1>Sprite Lab <span class="round">Round 1</span></h1>
+            <p id="art-status" class="status">Loading sprites…</p>
+          </div>
+          <p class="hint">Click a hex to run there · <kbd>S</kbd> or Shoot to strike at the nearest goal</p>
+        </header>
+        <div id="stage"></div>
+        <div id="banner"></div>
+        <footer class="perf"><span id="fps"></span> · <span id="stats"></span> · <span id="px-per-unit"></span> px per world unit</footer>
+      </section>
+
+      <aside class="panel">
+        <h2><span id="selected-name">#10 Playmaker</span></h2>
+        <div class="btns">
+          <button id="shoot" class="primary">Shoot</button>
+          <button id="reset">Reset ball</button>
+        </div>
+
+        <h3>Preview in place</h3>
+        <div class="btns" id="preview"></div>
+        <div class="facings" id="facings"></div>
+
+        <h3>Gear (layered paper-doll)</h3>
+        <div id="gear-rows"></div>
+        <div class="btns presets" id="presets"></div>
+
+        <h3>Checks</h3>
+        <label class="toggle"><input type="checkbox" id="anchors" /> Show per-frame anchors</label>
+        <label class="toggle"><input type="checkbox" id="crowd" /> Ten sprites (performance)</label>
+        <label class="toggle">Zoom <input type="range" id="zoom" min="0.7" max="2.2" step="0.05" value="1" /></label>
+
+        <h3>64 px legibility, six facings</h3>
+        <p class="small">Top: current gear. Bottom: base kit. Orange labels are mirrored facings (note the reversed “10”).</p>
+        <canvas id="strip"></canvas>
+      </aside>
+    </main>
+    <script type="module" src="/src/lab/main.ts"></script>
+  </body>
+</html>

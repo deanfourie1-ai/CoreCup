@@ -14,6 +14,8 @@ npm run dev
 
 Then open the address it prints (usually http://localhost:5173).
 
+The 2D sprite art test lives at `/sprite-lab.html` (see [docs/2d-sprites](docs/2d-sprites/README.md)).
+
 ## Other commands
 
 | Command | What it does |
@@ -30,4 +32,7 @@ Then open the address it prints (usually http://localhost:5173).
   - `rules.ts` holds every tunable number (costs, flight times, match length), so playtests can change values without touching the engine.
   - Matches are seeded, so the same seed and coaches replay the same match.
 - `src/data/` holds game data such as clubs and players.
+- `src/sprites/` holds the 2D sprite system: atlas contract, facings, layered gear and the compositor.
+- `src/lab/` is the Sprite Lab page (three.js pitch, sprite players).
+- `public/sprites/` holds sprite atlases; `tools/sprites/` has the scripts that prepared them.
 - Everything else in `src/` is the screen.

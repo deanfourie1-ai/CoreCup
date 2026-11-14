@@ -49,7 +49,9 @@ export function App() {
         )}
       </section>
 
-      <footer>Step 1 of the build plan: project setup. Next up: the hex pitch.</footer>
+      <footer>
+        Rules engine is in. Art test: <a href="sprite-lab.html">Sprite Lab (2D anime sprites, Round 1)</a>.
+      </footer>
     </main>
   );
 }

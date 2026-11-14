@@ -3,10 +3,9 @@
 // Rendering only. When abilities exist in the rules engine, the engine decides the
 // decoy hexes, who reacts and whether a swap happens, and this plays it back.
 //
-//   Spark     one decoy: a pink hex marker and a translucent ghost of her on it
-//   Surge     not designed yet; plays as Spark. (The lure of the two nearest players is
-//             kept for Ascended only, as a look test, not a rule.)
-//   Ascended  two decoys, then she swaps places with one in a foxfire streak
+//   Spark     one decoy (pink hex marker and a translucent ghost) that draws a reaction
+//   Surge     not designed yet, so it plays as Spark
+//   Ascended  two decoys (two reactions), then she swaps places with one in a foxfire streak
 //
 // Timeline (seconds after the cast): 0-0.6 focus (foxfire gathers around her),
 // 0.6 release (flames fly to the decoy hexes, ghosts appear), 1.4 swap
@@ -113,7 +112,7 @@ export class FoxMirage {
     if (!this.released && t >= FOCUS + FLY * 0.6) {
       this.released = true;
       this.onRelease?.();
-      if (this.tier >= 3) this.lureNearest(2);
+      this.lureNearest(this.tier >= 3 ? 2 : 1); // each decoy draws a reaction
     }
 
     // Decoys: marker and ghost fade in on release, flicker, dissolve upwards at the end.
@@ -141,7 +140,7 @@ export class FoxMirage {
       }
     }
 
-    // Surge: foxfire wisps beckon the players it fooled towards the decoy.
+    // Reactions: foxfire wisps beckon the fooled players towards the decoy.
     for (const l of this.lures) {
       const d = this.decoys[0].pos;
       const fade = 1 - clamp01((t - DISSOLVE_AT) / (END - DISSOLVE_AT));

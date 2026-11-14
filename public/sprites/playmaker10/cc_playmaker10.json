@@ -1231,6 +1231,7 @@
   "loco_jog": {
    "fps": 7,
    "loop": true,
+   "stride_px": 360,
    "views": {
     "front_three_quarter": [
      {

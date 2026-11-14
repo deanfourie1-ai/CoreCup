@@ -57,6 +57,11 @@ export interface SpriteEvent {
 export interface ActionDef {
   fps: number;
   loop: boolean;
+  /**
+   * Ground distance one loop covers, in frame pixels (two strides for a run).
+   * When set, playback speed follows movement speed so the feet don't slide.
+   */
+  stride_px?: number;
   views: Partial<Record<ViewName, ActionFrame[]>>;
   events: SpriteEvent[];
 }

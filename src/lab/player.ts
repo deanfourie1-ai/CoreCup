@@ -12,7 +12,7 @@ import { hexToWorld } from './pitch';
 
 /** World height of the whole 256x352 frame; the character is ~86% of it (about 1.15 hex widths tall). */
 export const FRAME_WORLD_H = 2.3;
-const RUN_SPEED = 2.4; // world units per second
+const RUN_SPEED = 3.8; // world units per second (about 2.2 hexes a second)
 /** How often animated gear (glows, flames) is redrawn between frame changes. */
 const GLOW_HZ = 12;
 
@@ -155,7 +155,10 @@ export class SpritePlayer {
     // Animation clock.
     const action = this.sheet.def.actions[this.action]!;
     this.frameClock += dt;
-    const frameDur = 1 / action.fps;
+    // Lock the run cycle to ground speed so feet don't skate: one loop covers `stride_px` of ground.
+    const steps = action.views[resolveFrame(this.sheet.def, this.action, this.dir, 0).view]!.length;
+    const fps = action.stride_px && this.moving ? (steps * RUN_SPEED) / (action.stride_px * this.k) : action.fps;
+    const frameDur = 1 / fps;
     while (this.frameClock >= frameDur && !this.finished) {
       this.frameClock -= frameDur;
       const rf = resolveFrame(this.sheet.def, this.action, this.dir, this.frameIndex);

@@ -41,6 +41,8 @@ ACTIONS = {
     "loco_jog": {
         "fps": 7,
         "loop": True,
+        # Two strides per loop; each stride is roughly the toe-to-toe spread of the side frames (~180 px).
+        "stride_px": 360,
         "views": {
             "front_three_quarter": jog("front_three_quarter"),
             "side": jog("side"),

@@ -43,7 +43,8 @@ export const CLUBS: ClubDef[] = [
       { name: 'Hollis Stonewright', role: 'Keeper', core: 'Golem' },
       { name: 'Lan Shuyi', role: 'Defender', core: 'Qilin' },
       { name: 'Kweku Thread', role: 'Midfielder', core: 'Anansi' },
-      { name: 'Rune Halvard', role: 'Midfielder', core: 'Fenrir' },
+      // #10 playmaker from the 2D sprite work; her name is not chosen yet.
+      { name: 'Playmaker #10', role: 'Midfielder', core: 'Kitsune' },
       { name: 'Iggy Vale', role: 'Striker', core: 'Phoenix' },
     ],
   },
@@ -55,7 +56,7 @@ export const CLUBS: ClubDef[] = [
     players: [
       { name: 'Old Xuan', role: 'Keeper', core: 'Black Tortoise' },
       { name: 'Brin Tolland', role: 'Defender', core: 'Kraken' },
-      { name: 'Sora Fennick', role: 'Midfielder', core: 'Kitsune' },
+      { name: 'Sora Fennick', role: 'Midfielder', core: 'Fenrir' },
       { name: 'Niamh Brack', role: 'Midfielder', core: 'Kelpie' },
       { name: 'Tauro Kastellan', role: 'Striker', core: 'Minotaur' },
     ],

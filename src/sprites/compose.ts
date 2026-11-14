@@ -30,7 +30,7 @@ export function composeFrame(
 
   const m = stepMatrix(rf.step, sheet.pivot);
   const anchors = transformAnchors(rf.frame.anchors, m);
-  const g: GearContext = { ctx, a: anchors, view: rf.view, t, coreColour: sheet.def.coreColour };
+  const g: GearContext = { ctx, a: anchors, view: rf.view, t, coreColour: sheet.def.coreColour, creature: sheet.def.coreCreature };
 
   if (!opts.baseOnly) {
     drawAura(g, loadout.core);

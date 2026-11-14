@@ -71,6 +71,8 @@ export interface SpriteSheetDef {
   frameSize: [number, number];
   pivot_normalized: [number, number];
   coreColour: string;
+  /** Creature core, which picks the Ascended spirit shape (e.g. 'kitsune'). */
+  coreCreature?: string;
   views: Partial<Record<ViewName, { faces: string }>>;
   layers: string[];
   frames: Record<string, FrameDef>;

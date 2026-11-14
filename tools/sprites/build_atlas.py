@@ -89,7 +89,8 @@ def main(src: Path, out: Path):
         "image": "cc_playmaker10_atlas.png",
         "frameSize": [W, H],
         "pivot_normalized": [0.5, 0.97],
-        "coreColour": "#ffb43c",
+        "coreColour": "#ff6f9e",
+        "coreCreature": "kitsune",
         "views": {
             "front": {"faces": "S"},
             "front_three_quarter": {"faces": "SE"},

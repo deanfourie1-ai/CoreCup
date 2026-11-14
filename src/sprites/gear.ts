@@ -22,6 +22,8 @@ export interface GearContext {
   /** Seconds, for glow pulses and flames. */
   t: number;
   coreColour: string;
+  /** Creature core id; picks the Ascended spirit shape. */
+  creature?: string;
 }
 
 /** Which depth pass is being drawn: behind the body, or in front of it. */
@@ -398,6 +400,7 @@ function drawBoots(g: GearContext, tier: Tier, pass: Pass) {
 /** The creature spirit behind the body at Ascended. Kept clear of the face. */
 export function drawAura(g: GearContext, tier: Tier) {
   if (tier < 3) return;
+  if (g.creature === 'kitsune') return drawFoxTails(g);
   const { ctx, a, t } = g;
   const back = a.back ?? a.chest_core;
   if (!back) return;
@@ -433,6 +436,43 @@ export function drawAura(g: GearContext, tier: Tier) {
   }
   ctx.restore();
   glow(ctx, x, y, 70, g.coreColour, 0.4);
+}
+
+/** Kitsune: a fan of foxfire tails rising from the lower back, kept beside the head, never over the face. */
+function drawFoxTails(g: GearContext) {
+  const { ctx, a, t } = g;
+  const back = a.back ?? a.chest_core;
+  if (!back) return;
+  const [x, y] = [back[0], back[1] + 30];
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  const tails = 7;
+  for (let i = 0; i < tails; i++) {
+    // Fan from low-left round to low-right, skipping straight up where the head is.
+    const side = i < tails / 2 ? -1 : 1;
+    const k = i < tails / 2 ? i : tails - 1 - i;
+    const ang = -Math.PI / 2 + side * (0.75 + k * 0.32) + Math.sin(t * 2.4 + i) * 0.08;
+    const len = 104 - Math.abs(k - 1) * 8;
+    const tipX = x + Math.cos(ang) * len;
+    const tipY = y + Math.sin(ang) * len;
+    const bend = side * 26;
+    const grad = ctx.createLinearGradient(x, y, tipX, tipY);
+    grad.addColorStop(0, '#ffd9a0');
+    grad.addColorStop(0.35, g.coreColour + 'ee');
+    grad.addColorStop(0.8, '#ff9a5a99');
+    grad.addColorStop(1, '#ffffff00');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(x - 5, y);
+    ctx.quadraticCurveTo((x + tipX) / 2 - bend, (y + tipY) / 2 - 10, tipX, tipY);
+    ctx.quadraticCurveTo((x + tipX) / 2 - bend * 0.3, (y + tipY) / 2 + 12, x + 5, y);
+    ctx.closePath();
+    ctx.fill();
+    // White-hot tail tip.
+    glow(ctx, tipX, tipY, 9, '#fff3f8', 0.6);
+  }
+  ctx.restore();
+  glow(ctx, x, y - 10, 60, g.coreColour, 0.35);
 }
 
 function drawCore(g: GearContext, tier: Tier) {

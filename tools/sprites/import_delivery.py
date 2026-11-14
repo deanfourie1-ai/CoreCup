@@ -193,11 +193,15 @@ class Packer:
 
 
 def main():
+    global W, H, PIVOT
     ap = argparse.ArgumentParser()
     ap.add_argument("src", type=Path)
     ap.add_argument("out", type=Path)
     ap.add_argument("--character", default="kitsune10")
+    ap.add_argument("--canvas", default="256x352", help="frame size, e.g. 320x384 (feet stay 11 px above the bottom)")
     args = ap.parse_args()
+    W, H = (int(v) for v in args.canvas.split("x"))
+    PIVOT = (W // 2, H - 11)
     char, src, out = args.character, args.src, args.out
     rep = Report()
     notes = json.loads((src / "notes.json").read_text()) if (src / "notes.json").exists() else {}

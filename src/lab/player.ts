@@ -35,7 +35,8 @@ export class SpritePlayer {
 
   private readonly canvas: HTMLCanvasElement;
   private readonly ctx: CanvasRenderingContext2D;
-  private readonly texture: THREE.CanvasTexture;
+  /** The live composite; Fox Mirage ghosts share it. */
+  readonly texture: THREE.CanvasTexture;
   private readonly k: number; // world units per frame pixel
   private frameIndex = 0;
   private frameClock = 0;
@@ -123,6 +124,13 @@ export class SpritePlayer {
 
   stop() {
     this.path = [];
+  }
+
+  /** Jump straight to a hex (Fox Mirage swap). */
+  place(hex: Hex) {
+    this.path = [];
+    this.hex = hex;
+    this.pos.copy(hexToWorld(hex));
   }
 
   /** World position of an anchor on the current frame. */

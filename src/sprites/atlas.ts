@@ -6,18 +6,25 @@ import type { ActionDef, ActionFrame, ActionName, Anchor, Anchors, FrameDef, Spr
 
 export interface SpriteSheet {
   def: SpriteSheetDef;
-  image: HTMLImageElement;
+  /** Atlas pages, in `def.images` order (or just `def.image`). */
+  images: HTMLImageElement[];
   /** Foot pivot in frame pixels. */
   pivot: [number, number];
 }
 
 export async function loadSpriteSheet(jsonUrl: string): Promise<SpriteSheet> {
   const def = (await (await fetch(jsonUrl)).json()) as SpriteSheetDef;
-  const image = new Image();
-  image.src = new URL(def.image, new URL(jsonUrl, location.href)).href;
-  await image.decode();
+  const base = new URL(jsonUrl, location.href);
+  const images = await Promise.all(
+    (def.images ?? [def.image]).map(async (src) => {
+      const img = new Image();
+      img.src = new URL(src, base).href;
+      await img.decode();
+      return img;
+    }),
+  );
   const [w, h] = def.frameSize;
-  return { def, image, pivot: [w * def.pivot_normalized[0], h * def.pivot_normalized[1]] };
+  return { def, images, pivot: [w * def.pivot_normalized[0], h * def.pivot_normalized[1]] };
 }
 
 export interface ResolvedFrame extends Facing {

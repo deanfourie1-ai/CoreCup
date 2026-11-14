@@ -49,8 +49,12 @@ Timing is "on twos" anime style; the fps below is the playback rate.
 Run cycle rules:
 - Draw the run "on the spot", like a treadmill. The game moves the sprite forward at ground speed, so a
   foot on the ground must slide **backwards** in the image by the same amount each frame:
-  `stride_px / 8` px per frame (about 47 px at 380). Then it stays still on the pitch. Each foot is on the
-  ground for about 3 of the 8 frames. `tools/sprites/make_pose_guides.py` draws guide poses with this timing.
+  `stride_px / 8` px per frame (about 47 px at 380) along the ground. Seen through the camera that is 47 px
+  sideways for `e`/`w` and 24 px sideways for the four diagonal facings. Keep planted feet on the foot
+  line; the up/down part of a diagonal stride does not fit the canvas and is left to the game. Each foot
+  is on the ground for about 3 of the 8 frames. `tools/sprites/make_pose_guides.py` draws guide poses with
+  this timing.
+- Same scale in every frame: a crouched or airborne pose must not be drawn smaller.
 - Tell us the **stride length in pixels**: how far one foot travels along the ground in one full cycle of
   two strides. Aim for a cycle of about 380 px (one hex is about 265 px wide at frame scale).
 

@@ -7,8 +7,8 @@ also show where each anchor belongs.
 
 Run timing (8 frames, two strides, each foot on the ground for 3 frames):
 the ground moves under her by STRIDE_PX / 8 px per frame. In the image a planted foot therefore
-slides BACKWARDS by exactly that much each frame; once the game moves the sprite forward at
-ground speed, the foot stays still on the pitch.
+slides BACKWARDS by exactly that much each frame, as seen by the game camera (see PLANT_SHIFT);
+once the game moves the sprite forward at ground speed, the foot stays still on the pitch.
 
     python3 tools/sprites/make_pose_guides.py <out dir> [--dots-only]
 
@@ -28,6 +28,15 @@ STEP = STRIDE_PX / 8  # ground travel per frame
 HEIGHT = 300
 TILT = math.atan2(16, 20)  # game camera pitch, about 39 degrees
 FACINGS = {"e": 0, "se": 60, "sw": 120, "w": 180, "nw": 240, "ne": 300}
+
+
+def plant_shift(facing):
+    """Image px a planted foot moves each run frame (x right, y down).
+
+    Only the sideways part is drawn; the up/down part (diagonal facings) does not fit the canvas.
+    """
+    a = math.radians(FACINGS[facing])
+    return (-STEP * math.cos(a), 0.0)
 THIGH = SHIN = 84
 
 # Foot path per phase (forward px from the hip, height px). Phases 0-2 are stance:
@@ -102,8 +111,10 @@ def project(p, facing):
     right = (-math.sin(a), math.cos(a))
     x = p[0] * fwd[0] + p[2] * right[0]
     z = p[0] * fwd[1] + p[2] * right[1]
-    # A little depth drop for the near side, kept small so the soles stay on the foot line.
-    return (PIVOT[0] + x, min(PIVOT[1] - p[1] + z * math.sin(TILT) * 0.2, PIVOT[1] - 5), z)
+    # Feet stay on the foot line in every facing. Through the 39 degree camera a diagonal stride
+    # would also move the planted foot up or down the image (about 26 px a frame), but the canvas
+    # has only 11 px below the foot line, so that part is left to the game (see plant_shift).
+    return (PIVOT[0] + x, PIVOT[1] - p[1], z)
 
 
 def anchors(P, facing):
@@ -223,6 +234,9 @@ def main():
         (out / "delivery" / "notes.json").write_text(
             '{"stride_px": %d, "core_colour": "#ff6f9e", "core_creature": "kitsune"}' % STRIDE_PX
         )
+    for f in FACINGS:
+        sx, sy = plant_shift(f)
+        print(f"{f}: planted foot moves ({sx:+.0f}, {sy:+.0f}) px per frame")
     print(f"wrote guides to {out}")
 
 

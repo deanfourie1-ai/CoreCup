@@ -6,6 +6,9 @@ export function App() {
       <h1 className="title">Core Cup</h1>
       <p className="subtitle">Placeholder board. You coach Emberforge Foundry against the Tidewell Mariners AI.</p>
       <MatchScreen />
+      <p className="subtitle">
+        Art test: <a href="sprite-lab.html">Sprite Lab (2D anime sprites, Round 1)</a>
+      </p>
     </main>
   );
 }

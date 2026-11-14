@@ -1,0 +1,1345 @@
+{
+ "player": "emberforge_playmaker_10",
+ "status": "placeholder",
+ "note": "Frames are cropped from AI-generated handoff concept art and only cleaned/registered automatically. Not production art.",
+ "image": "cc_playmaker10_atlas.png",
+ "frameSize": [
+  256,
+  352
+ ],
+ "pivot_normalized": [
+  0.5,
+  0.97
+ ],
+ "coreColour": "#ff6f9e",
+ "coreCreature": "kitsune",
+ "views": {
+  "front": {
+   "faces": "S"
+  },
+  "front_three_quarter": {
+   "faces": "SE"
+  },
+  "side": {
+   "faces": "E"
+  },
+  "back_three_quarter": {
+   "faces": "NE"
+  }
+ },
+ "layers": [
+  "aura",
+  "gear_back",
+  "base",
+  "gear_legs",
+  "gear_boots",
+  "gear_arms",
+  "gear_shoulders",
+  "gear_head",
+  "core",
+  "fx"
+ ],
+ "frames": {
+  "idle_front_00": {
+   "rect": [
+    0,
+    0,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     125,
+     40,
+     1
+    ],
+    "brow": [
+     125,
+     88,
+     1
+    ],
+    "shoulder_R": [
+     100,
+     112,
+     1
+    ],
+    "shoulder_L": [
+     155,
+     112,
+     1
+    ],
+    "forearm_R": [
+     92,
+     140,
+     1
+    ],
+    "hand_R": [
+     110,
+     155,
+     1
+    ],
+    "forearm_L": [
+     165,
+     142,
+     1
+    ],
+    "hand_L": [
+     160,
+     157,
+     1
+    ],
+    "chest_core": [
+     132,
+     120,
+     1
+    ],
+    "back": [
+     128,
+     118,
+     -1
+    ],
+    "shin_R": [
+     107,
+     240,
+     1
+    ],
+    "heel_R": [
+     93,
+     330,
+     1
+    ],
+    "toe_R": [
+     91,
+     341,
+     1
+    ],
+    "shin_L": [
+     145,
+     242,
+     1
+    ],
+    "heel_L": [
+     152,
+     330,
+     1
+    ],
+    "toe_L": [
+     158,
+     341,
+     1
+    ]
+   }
+  },
+  "jog_front_three_quarter_00": {
+   "rect": [
+    256,
+    0,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     135,
+     42,
+     1
+    ],
+    "brow": [
+     150,
+     71,
+     1
+    ],
+    "shoulder_R": [
+     102,
+     115,
+     1
+    ],
+    "shoulder_L": [
+     160,
+     112,
+     -1
+    ],
+    "forearm_R": [
+     75,
+     147,
+     1
+    ],
+    "hand_R": [
+     74,
+     171,
+     1
+    ],
+    "forearm_L": [
+     155,
+     156,
+     -1
+    ],
+    "hand_L": [
+     170,
+     167,
+     -1
+    ],
+    "chest_core": [
+     145,
+     132,
+     1
+    ],
+    "back": [
+     130,
+     125,
+     -1
+    ],
+    "shin_R": [
+     127,
+     247,
+     1
+    ],
+    "heel_R": [
+     115,
+     327,
+     1
+    ],
+    "toe_R": [
+     147,
+     335,
+     1
+    ],
+    "shin_L": [
+     102,
+     252,
+     -1
+    ],
+    "heel_L": [
+     67,
+     292,
+     -1
+    ],
+    "toe_L": [
+     75,
+     330,
+     -1
+    ]
+   }
+  },
+  "jog_front_three_quarter_01": {
+   "rect": [
+    512,
+    0,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     139,
+     42,
+     1
+    ],
+    "brow": [
+     159,
+     71,
+     1
+    ],
+    "shoulder_R": [
+     106,
+     115,
+     1
+    ],
+    "shoulder_L": [
+     161,
+     112,
+     -1
+    ],
+    "forearm_R": [
+     84,
+     137,
+     1
+    ],
+    "hand_R": [
+     83,
+     165,
+     1
+    ],
+    "forearm_L": [
+     159,
+     152,
+     -1
+    ],
+    "hand_L": [
+     174,
+     156,
+     -1
+    ],
+    "chest_core": [
+     144,
+     132,
+     1
+    ],
+    "back": [
+     132,
+     125,
+     -1
+    ],
+    "shin_R": [
+     139,
+     224,
+     1
+    ],
+    "heel_R": [
+     101,
+     262,
+     1
+    ],
+    "toe_R": [
+     94,
+     292,
+     1
+    ],
+    "shin_L": [
+     84,
+     255,
+     -1
+    ],
+    "heel_L": [
+     69,
+     300,
+     -1
+    ],
+    "toe_L": [
+     76,
+     337,
+     -1
+    ]
+   }
+  },
+  "jog_front_three_quarter_02": {
+   "rect": [
+    768,
+    0,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     135,
+     42,
+     1
+    ],
+    "brow": [
+     150,
+     75,
+     1
+    ],
+    "shoulder_R": [
+     100,
+     115,
+     1
+    ],
+    "shoulder_L": [
+     160,
+     115,
+     -1
+    ],
+    "forearm_R": [
+     75,
+     145,
+     1
+    ],
+    "hand_R": [
+     74,
+     171,
+     1
+    ],
+    "forearm_L": [
+     157,
+     157,
+     -1
+    ],
+    "hand_L": [
+     171,
+     167,
+     -1
+    ],
+    "chest_core": [
+     145,
+     132,
+     1
+    ],
+    "back": [
+     130,
+     125,
+     -1
+    ],
+    "shin_R": [
+     122,
+     245,
+     1
+    ],
+    "heel_R": [
+     127,
+     322,
+     1
+    ],
+    "toe_R": [
+     162,
+     330,
+     1
+    ],
+    "shin_L": [
+     102,
+     232,
+     -1
+    ],
+    "heel_L": [
+     80,
+     215,
+     -1
+    ],
+    "toe_L": [
+     62,
+     245,
+     -1
+    ]
+   }
+  },
+  "jog_front_three_quarter_03": {
+   "rect": [
+    0,
+    352,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     139,
+     42,
+     1
+    ],
+    "brow": [
+     161,
+     72,
+     1
+    ],
+    "shoulder_R": [
+     109,
+     117,
+     1
+    ],
+    "shoulder_L": [
+     169,
+     115,
+     -1
+    ],
+    "forearm_R": [
+     96,
+     142,
+     1
+    ],
+    "hand_R": [
+     106,
+     165,
+     1
+    ],
+    "forearm_L": [
+     164,
+     160,
+     -1
+    ],
+    "hand_L": [
+     179,
+     160,
+     -1
+    ],
+    "chest_core": [
+     151,
+     132,
+     1
+    ],
+    "back": [
+     138,
+     125,
+     -1
+    ],
+    "shin_R": [
+     144,
+     245,
+     1
+    ],
+    "heel_R": [
+     144,
+     317,
+     1
+    ],
+    "toe_R": [
+     179,
+     307,
+     1
+    ],
+    "shin_L": [
+     99,
+     240,
+     -1
+    ],
+    "heel_L": [
+     71,
+     210,
+     -1
+    ],
+    "toe_L": [
+     54,
+     237,
+     -1
+    ]
+   }
+  },
+  "jog_side_00": {
+   "rect": [
+    256,
+    352,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     117,
+     42,
+     1
+    ],
+    "brow": [
+     157,
+     77,
+     1
+    ],
+    "shoulder_R": [
+     137,
+     132,
+     1
+    ],
+    "shoulder_L": [
+     115,
+     120,
+     -1
+    ],
+    "forearm_R": [
+     150,
+     157,
+     1
+    ],
+    "hand_R": [
+     170,
+     160,
+     1
+    ],
+    "forearm_L": [
+     97,
+     140,
+     -1
+    ],
+    "hand_L": [
+     105,
+     157,
+     -1
+    ],
+    "chest_core": [
+     142,
+     120,
+     1
+    ],
+    "back": [
+     112,
+     125,
+     -1
+    ],
+    "shin_R": [
+     100,
+     252,
+     1
+    ],
+    "heel_R": [
+     42,
+     265,
+     1
+    ],
+    "toe_R": [
+     22,
+     300,
+     1
+    ],
+    "shin_L": [
+     152,
+     245,
+     -1
+    ],
+    "heel_L": [
+     160,
+     320,
+     -1
+    ],
+    "toe_L": [
+     202,
+     315,
+     -1
+    ]
+   }
+  },
+  "jog_side_01": {
+   "rect": [
+    512,
+    352,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     129,
+     42,
+     1
+    ],
+    "brow": [
+     166,
+     77,
+     1
+    ],
+    "shoulder_R": [
+     144,
+     135,
+     1
+    ],
+    "shoulder_L": [
+     119,
+     122,
+     -1
+    ],
+    "forearm_R": [
+     154,
+     157,
+     1
+    ],
+    "hand_R": [
+     174,
+     154,
+     1
+    ],
+    "forearm_L": [
+     104,
+     137,
+     -1
+    ],
+    "hand_L": [
+     109,
+     157,
+     -1
+    ],
+    "chest_core": [
+     144,
+     120,
+     1
+    ],
+    "back": [
+     118,
+     125,
+     -1
+    ],
+    "shin_R": [
+     79,
+     265,
+     1
+    ],
+    "heel_R": [
+     56,
+     307,
+     1
+    ],
+    "toe_R": [
+     79,
+     337,
+     1
+    ],
+    "shin_L": [
+     159,
+     230,
+     -1
+    ],
+    "heel_L": [
+     104,
+     240,
+     -1
+    ],
+    "toe_L": [
+     84,
+     275,
+     -1
+    ]
+   }
+  },
+  "jog_side_02": {
+   "rect": [
+    768,
+    352,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     120,
+     42,
+     1
+    ],
+    "brow": [
+     165,
+     77,
+     1
+    ],
+    "shoulder_R": [
+     142,
+     135,
+     1
+    ],
+    "shoulder_L": [
+     117,
+     120,
+     -1
+    ],
+    "forearm_R": [
+     150,
+     157,
+     1
+    ],
+    "hand_R": [
+     175,
+     156,
+     1
+    ],
+    "forearm_L": [
+     100,
+     137,
+     -1
+    ],
+    "hand_L": [
+     107,
+     152,
+     -1
+    ],
+    "chest_core": [
+     140,
+     120,
+     1
+    ],
+    "back": [
+     115,
+     125,
+     -1
+    ],
+    "shin_R": [
+     80,
+     250,
+     1
+    ],
+    "heel_R": [
+     42,
+     297,
+     1
+    ],
+    "toe_R": [
+     37,
+     337,
+     1
+    ],
+    "shin_L": [
+     165,
+     237,
+     -1
+    ],
+    "heel_L": [
+     172,
+     312,
+     -1
+    ],
+    "toe_L": [
+     212,
+     307,
+     -1
+    ]
+   }
+  },
+  "jog_side_03": {
+   "rect": [
+    0,
+    704,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     129,
+     42,
+     1
+    ],
+    "brow": [
+     169,
+     77,
+     1
+    ],
+    "shoulder_R": [
+     144,
+     135,
+     1
+    ],
+    "shoulder_L": [
+     121,
+     125,
+     -1
+    ],
+    "forearm_R": [
+     159,
+     160,
+     1
+    ],
+    "hand_R": [
+     171,
+     151,
+     1
+    ],
+    "forearm_L": [
+     109,
+     140,
+     -1
+    ],
+    "hand_L": [
+     116,
+     155,
+     -1
+    ],
+    "chest_core": [
+     144,
+     122,
+     1
+    ],
+    "back": [
+     120,
+     128,
+     -1
+    ],
+    "shin_R": [
+     104,
+     245,
+     1
+    ],
+    "heel_R": [
+     64,
+     210,
+     1
+    ],
+    "toe_R": [
+     39,
+     235,
+     1
+    ],
+    "shin_L": [
+     161,
+     245,
+     -1
+    ],
+    "heel_L": [
+     169,
+     320,
+     -1
+    ],
+    "toe_L": [
+     209,
+     315,
+     -1
+    ]
+   }
+  },
+  "jog_back_three_quarter_00": {
+   "rect": [
+    256,
+    704,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     127,
+     42,
+     1
+    ],
+    "brow": [
+     167,
+     77,
+     1
+    ],
+    "shoulder_R": [
+     105,
+     115,
+     1
+    ],
+    "shoulder_L": [
+     160,
+     115,
+     1
+    ],
+    "forearm_R": [
+     90,
+     132,
+     1
+    ],
+    "hand_R": [
+     102,
+     150,
+     1
+    ],
+    "forearm_L": [
+     162,
+     140,
+     1
+    ],
+    "hand_L": [
+     172,
+     151,
+     1
+    ],
+    "chest_core": [
+     150,
+     125,
+     -1
+    ],
+    "back": [
+     127,
+     117,
+     1
+    ],
+    "shin_R": [
+     102,
+     245,
+     1
+    ],
+    "heel_R": [
+     62,
+     300,
+     1
+    ],
+    "toe_R": [
+     75,
+     340,
+     1
+    ],
+    "shin_L": [
+     142,
+     227,
+     -1
+    ],
+    "heel_L": [
+     107,
+     275,
+     -1
+    ],
+    "toe_L": [
+     122,
+     310,
+     -1
+    ]
+   }
+  },
+  "jog_back_three_quarter_01": {
+   "rect": [
+    512,
+    704,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     131,
+     42,
+     1
+    ],
+    "brow": [
+     171,
+     77,
+     1
+    ],
+    "shoulder_R": [
+     109,
+     112,
+     1
+    ],
+    "shoulder_L": [
+     159,
+     115,
+     1
+    ],
+    "forearm_R": [
+     94,
+     130,
+     1
+    ],
+    "hand_R": [
+     109,
+     147,
+     1
+    ],
+    "forearm_L": [
+     159,
+     137,
+     1
+    ],
+    "hand_L": [
+     174,
+     151,
+     1
+    ],
+    "chest_core": [
+     150,
+     125,
+     -1
+    ],
+    "back": [
+     131,
+     117,
+     1
+    ],
+    "shin_R": [
+     94,
+     250,
+     1
+    ],
+    "heel_R": [
+     56,
+     300,
+     1
+    ],
+    "toe_R": [
+     71,
+     340,
+     1
+    ],
+    "shin_L": [
+     166,
+     215,
+     -1
+    ],
+    "heel_L": [
+     111,
+     257,
+     -1
+    ],
+    "toe_L": [
+     116,
+     282,
+     -1
+    ]
+   }
+  },
+  "jog_back_three_quarter_02": {
+   "rect": [
+    768,
+    704,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     135,
+     42,
+     1
+    ],
+    "brow": [
+     172,
+     77,
+     1
+    ],
+    "shoulder_R": [
+     110,
+     112,
+     1
+    ],
+    "shoulder_L": [
+     162,
+     115,
+     1
+    ],
+    "forearm_R": [
+     90,
+     135,
+     1
+    ],
+    "hand_R": [
+     89,
+     160,
+     1
+    ],
+    "forearm_L": [
+     165,
+     140,
+     1
+    ],
+    "hand_L": [
+     177,
+     151,
+     1
+    ],
+    "chest_core": [
+     155,
+     128,
+     -1
+    ],
+    "back": [
+     132,
+     120,
+     1
+    ],
+    "shin_R": [
+     115,
+     245,
+     1
+    ],
+    "heel_R": [
+     87,
+     312,
+     1
+    ],
+    "toe_R": [
+     120,
+     340,
+     1
+    ],
+    "shin_L": [
+     112,
+     235,
+     -1
+    ],
+    "heel_L": [
+     87,
+     237,
+     -1
+    ],
+    "toe_L": [
+     77,
+     277,
+     -1
+    ]
+   }
+  },
+  "jog_back_three_quarter_03": {
+   "rect": [
+    0,
+    1056,
+    256,
+    352
+   ],
+   "anchors": {
+    "head_top": [
+     139,
+     42,
+     1
+    ],
+    "brow": [
+     179,
+     77,
+     1
+    ],
+    "shoulder_R": [
+     116,
+     115,
+     1
+    ],
+    "shoulder_L": [
+     166,
+     115,
+     1
+    ],
+    "forearm_R": [
+     101,
+     135,
+     1
+    ],
+    "hand_R": [
+     114,
+     147,
+     1
+    ],
+    "forearm_L": [
+     169,
+     140,
+     1
+    ],
+    "hand_L": [
+     181,
+     151,
+     1
+    ],
+    "chest_core": [
+     160,
+     128,
+     -1
+    ],
+    "back": [
+     139,
+     120,
+     1
+    ],
+    "shin_R": [
+     124,
+     237,
+     -1
+    ],
+    "heel_R": [
+     84,
+     205,
+     -1
+    ],
+    "toe_R": [
+     59,
+     242,
+     -1
+    ],
+    "shin_L": [
+     146,
+     240,
+     1
+    ],
+    "heel_L": [
+     151,
+     317,
+     1
+    ],
+    "toe_L": [
+     184,
+     305,
+     1
+    ]
+   }
+  }
+ },
+ "actions": {
+  "loco_idle": {
+   "fps": 2,
+   "loop": true,
+   "views": {
+    "front": [
+     {
+      "frame": "idle_front_00"
+     },
+     {
+      "frame": "idle_front_00",
+      "sy": 1.012
+     }
+    ]
+   },
+   "events": []
+  },
+  "loco_jog": {
+   "fps": 7,
+   "loop": true,
+   "views": {
+    "front_three_quarter": [
+     {
+      "frame": "jog_front_three_quarter_00"
+     },
+     {
+      "frame": "jog_front_three_quarter_01"
+     },
+     {
+      "frame": "jog_front_three_quarter_02"
+     },
+     {
+      "frame": "jog_front_three_quarter_03"
+     }
+    ],
+    "side": [
+     {
+      "frame": "jog_side_00"
+     },
+     {
+      "frame": "jog_side_01"
+     },
+     {
+      "frame": "jog_side_02"
+     },
+     {
+      "frame": "jog_side_03"
+     }
+    ],
+    "back_three_quarter": [
+     {
+      "frame": "jog_back_three_quarter_00"
+     },
+     {
+      "frame": "jog_back_three_quarter_01"
+     },
+     {
+      "frame": "jog_back_three_quarter_02"
+     },
+     {
+      "frame": "jog_back_three_quarter_03"
+     }
+    ]
+   },
+   "events": [
+    {
+     "frame": 0,
+     "type": "foot_contact"
+    },
+    {
+     "frame": 2,
+     "type": "foot_contact"
+    }
+   ]
+  },
+  "shot_power": {
+   "fps": 10,
+   "loop": false,
+   "views": {
+    "side": [
+     {
+      "frame": "jog_side_02",
+      "dx": -6
+     },
+     {
+      "frame": "jog_side_01",
+      "rot": -3
+     },
+     {
+      "frame": "jog_side_03",
+      "rot": -9,
+      "dx": -8
+     },
+     {
+      "frame": "jog_side_00",
+      "rot": 7,
+      "dx": 6
+     },
+     {
+      "frame": "jog_side_00",
+      "rot": 11,
+      "dx": 10,
+      "dy": -5
+     },
+     {
+      "frame": "jog_side_02",
+      "rot": 3,
+      "dx": 4
+     },
+     {
+      "frame": "jog_side_02"
+     }
+    ]
+   },
+   "events": [
+    {
+     "frame": 2,
+     "type": "wind_up"
+    },
+    {
+     "frame": 3,
+     "type": "foot_contact",
+     "anchor": "toe_L"
+    },
+    {
+     "frame": 3,
+     "type": "ball_release"
+    }
+   ]
+  }
+ }
+}

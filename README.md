@@ -14,6 +14,8 @@ npm run dev
 
 Then open the address it prints (usually http://localhost:5173).
 
+The 2D sprite art test lives at `/sprite-lab.html` (see [docs/2d-sprites](docs/2d-sprites/README.md)).
+
 ## Other commands
 
 | Command | What it does |
@@ -32,3 +34,6 @@ Then open the address it prints (usually http://localhost:5173).
 - `src/data/` holds game data such as clubs and players.
 - `src/game/` connects the engine to a person: it pauses a step when the engine needs your answer (a reaction or a corner) and replays it once you answer.
 - `src/ui/` is the placeholder board: the hex pitch, the timeline track, action buttons and pop-ups. It will be reskinned once the art direction is final.
+- `src/sprites/` holds the 2D sprite system: atlas contract, facings, layered gear and the compositor.
+- `src/lab/` is the Sprite Lab page (three.js pitch, sprite players).
+- `public/sprites/` holds sprite atlases; `tools/sprites/` has the scripts that prepared them.

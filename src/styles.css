@@ -91,8 +91,9 @@ body {
 .token {
   position: absolute;
   transform: translateX(-50%);
-  font-size: 11px;
-  padding: 1px 5px;
+  font-size: 10px;
+  line-height: 13px;
+  padding: 0 5px;
   border-radius: 4px;
   white-space: nowrap;
   color: #10131f;
@@ -319,4 +320,114 @@ button.shoot {
 .big {
   font-size: 1.3rem;
   font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- match on the painted pitch */
+
+.match-page {
+  max-width: 1640px;
+}
+
+.match-page .subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Pitch on the left, sized so the whole of it fits on screen under the scoreboard and timeline;
+   action panel and match log in a column on the right. */
+.arena {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.stage-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: calc((100vh - 310px) * 16 / 9);
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #120b1d;
+  box-shadow: 0 0 0 2px #f2c25a, 0 0 0 6px #241232, 0 0 32px rgba(255, 79, 154, 0.25);
+}
+
+.stage canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.stage-banner {
+  position: absolute;
+  left: 50%;
+  top: 16%;
+  transform: translate(-50%, -8px) scale(0.92);
+  padding: 6px 22px;
+  border-radius: 999px;
+  background: rgba(26, 14, 36, 0.82);
+  color: #fffaf0;
+  font: italic 800 clamp(18px, 2.6vw, 34px) / 1.2 Saira, system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+  white-space: nowrap;
+}
+
+.stage-banner.show {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.stage-banner.big {
+  color: #ffd36b;
+  font-size: clamp(30px, 5.5vw, 72px);
+  text-shadow: 0 0 18px rgba(255, 79, 154, 0.9);
+  background: rgba(26, 14, 36, 0.6);
+}
+
+/* Action panel and match log beside the pitch, so nothing covers play. */
+.hud {
+  flex: 0 0 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hud .panel {
+  margin: 0;
+}
+
+.hud .actions .hint {
+  margin: 2px 0 8px;
+  font-size: 0.9rem;
+}
+
+.hud .log {
+  max-height: 260px;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .arena {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stage-wrap {
+    max-width: none;
+  }
+
+  .hud {
+    flex-basis: auto;
+  }
 }

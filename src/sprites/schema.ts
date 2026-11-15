@@ -115,7 +115,9 @@ export type ActionName =
   | 'shot_power'
   | 'ability'
   | 'run_to_shot'
-  | 'run_to_idle';
+  | 'run_to_idle'
+  /** Keepers: ready stance in front of goal. */
+  | 'keeper_ready';
 
 export interface SpriteSheetDef {
   player: string;

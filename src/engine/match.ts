@@ -11,6 +11,7 @@ import {
   hexKey,
   hexesWithin,
   inPitch,
+  lastCol,
   line,
   neighbours,
   sameHex,
@@ -49,7 +50,7 @@ export const attacksEast = (t: TeamId): boolean => t === 'home';
 
 /** Centre hex of the goal a team is shooting at. */
 export function targetGoal(team: TeamId): Hex {
-  return { col: attacksEast(team) ? 12 : 0, row: 4 };
+  return { col: attacksEast(team) ? lastCol(4) : 0, row: 4 };
 }
 
 /** Centre hex of the goal a team defends. */
@@ -59,8 +60,8 @@ export function ownGoal(team: TeamId): Hex {
 
 /** The three goal-line hexes a team defends: Left, Centre, Right from the keeper's view. */
 export function goalLine(team: TeamId): Hex[] {
-  const col = ownGoal(team).col;
-  return [3, 4, 5].map((row) => ({ col, row }));
+  const east = !attacksEast(team);
+  return [3, 4, 5].map((row) => ({ col: east ? lastCol(row) : 0, row }));
 }
 
 /** The goal-line hexes plus every hex touching them. */

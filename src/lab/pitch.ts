@@ -1,12 +1,12 @@
-// The 13x9 hex pitch as three.js meshes, laid out from the engine's hex grid.
+// The 9-row hex pitch (13 hexes in even rows, 12 in odd rows) as three.js meshes, laid out from the engine's hex grid.
 
 import * as THREE from 'three';
-import { PITCH_COLS, PITCH_ROWS, type Hex } from '../engine/hex';
+import { PITCH_COLS, PITCH_ROWS, inPitch, lastCol, pitchHexes, type Hex } from '../engine/hex';
 
 export const HEX_R = 1; // circumradius in world units
 const SQ3 = Math.sqrt(3);
 
-const OFFSET_X = (SQ3 * (PITCH_COLS - 0.5)) / 2;
+const OFFSET_X = (SQ3 * (PITCH_COLS - 1)) / 2;
 const OFFSET_Z = (1.5 * (PITCH_ROWS - 1)) / 2;
 
 /** World position (y = 0 ground) of a hex centre. x grows east, z grows south (towards the camera). */
@@ -33,8 +33,7 @@ export function worldToHex(x: number, z: number): Hex | null {
   else if (!(dy > dz)) rz = -rx - ry;
   const row = rz;
   const col = rx + (rz - (rz & 1)) / 2;
-  if (col < 0 || col >= PITCH_COLS || row < 0 || row >= PITCH_ROWS) return null;
-  return { col, row };
+  return inPitch({ col, row }) ? { col, row } : null;
 }
 
 /** Goal mouths: rows 3-5 of the end columns (as in the pitch mockup). */
@@ -89,22 +88,18 @@ export function buildPitch(): Pitch {
   // Hexes: one instanced mesh, two-tone mown stripes by column.
   const geo = new THREE.ShapeGeometry(hexShape(HEX_R * 0.95));
   geo.rotateX(-Math.PI / 2);
-  const count = PITCH_COLS * PITCH_ROWS;
-  const hexMesh = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ color: 0xffffff }), count);
+  const all = pitchHexes();
+  const hexMesh = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ color: 0xffffff }), all.length);
   const m = new THREE.Matrix4();
   const c = new THREE.Color();
-  let i = 0;
-  for (let row = 0; row < PITCH_ROWS; row++) {
-    for (let col = 0; col < PITCH_COLS; col++) {
-      const p = hexToWorld({ col, row });
-      m.makeTranslation(p.x, 0.04, p.z);
-      hexMesh.setMatrixAt(i, m);
-      const goalMouth = (col === 0 || col === PITCH_COLS - 1) && GOAL_ROWS.includes(row);
-      c.set(goalMouth ? 0x5f8f4a : col % 2 ? 0x4d7f4f : 0x568a56);
-      hexMesh.setColorAt(i, c);
-      i++;
-    }
-  }
+  all.forEach(({ col, row }, i) => {
+    const p = hexToWorld({ col, row });
+    m.makeTranslation(p.x, 0.04, p.z);
+    hexMesh.setMatrixAt(i, m);
+    const goalMouth = (col === 0 || col === lastCol(row)) && GOAL_ROWS.includes(row);
+    c.set(goalMouth ? 0x5f8f4a : col % 2 ? 0x4d7f4f : 0x568a56);
+    hexMesh.setColorAt(i, c);
+  });
   group.add(hexMesh);
 
   // Pitch markings.
@@ -124,11 +119,11 @@ export function buildPitch(): Pitch {
   // Goals: posts, crossbar and a simple net beyond each end.
   const goalCentre = { west: new THREE.Vector3(), east: new THREE.Vector3() };
   for (const side of ['west', 'east'] as const) {
-    const col = side === 'west' ? 0 : PITCH_COLS - 1;
-    const top = hexToWorld({ col, row: GOAL_ROWS[0] });
-    const bottom = hexToWorld({ col, row: GOAL_ROWS[GOAL_ROWS.length - 1] });
+    const colOf = (row: number) => (side === 'west' ? 0 : lastCol(row));
+    const top = hexToWorld({ col: colOf(GOAL_ROWS[0]), row: GOAL_ROWS[0] });
+    const bottom = hexToWorld({ col: colOf(GOAL_ROWS[GOAL_ROWS.length - 1]), row: GOAL_ROWS[GOAL_ROWS.length - 1] });
     const sign = side === 'west' ? -1 : 1;
-    const xs = GOAL_ROWS.map((row) => hexToWorld({ col, row }).x);
+    const xs = GOAL_ROWS.map((row) => hexToWorld({ col: colOf(row), row }).x);
     const x = (side === 'west' ? Math.min(...xs) : Math.max(...xs)) + sign * 1.25;
     const z0 = top.z - 0.9;
     const z1 = bottom.z + 0.9;

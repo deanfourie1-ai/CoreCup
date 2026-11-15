@@ -1,6 +1,6 @@
 import { CLUBS, ROLE_STATS, type ClubDef } from '../data/clubs';
 import type { Hex } from './hex';
-import { PITCH_COLS } from './hex';
+import { mirrorHex } from './hex';
 import type { MatchState, Robot, TeamId } from './types';
 
 export interface MatchOptions {
@@ -27,11 +27,9 @@ function formation(kickingOff: boolean): Hex[] {
   ];
 }
 
-const mirror = (h: Hex): Hex => ({ col: PITCH_COLS - 1 - h.col, row: h.row });
-
 export function kickoffPositions(team: TeamId, kickingOff: boolean): Hex[] {
   const f = formation(kickingOff);
-  return team === 'home' ? f : f.map(mirror);
+  return team === 'home' ? f : f.map(mirrorHex);
 }
 
 /** Puts both teams back in formation and gives the ball to the kicking-off striker. */

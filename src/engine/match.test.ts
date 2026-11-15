@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createSimpleAI } from './ai';
-import type { Hex } from './hex';
-import { activeRobot, ballHolder, legalActions, playMatch, robotById, shotOutcome, step } from './match';
+import { hexKey, mirrorHex, type Hex } from './hex';
+import { activeRobot, ballHolder, goalArea, goalLine, legalActions, playMatch, robotById, shotOutcome, step } from './match';
 import type { Rng } from './rng';
 import { RULES } from './rules';
 import { createMatch } from './setup';
@@ -70,6 +70,28 @@ describe('kick-off', () => {
     expect(s.robots).toHaveLength(10);
     expect(ballHolder(s)?.id).toBe('home-4');
     expect(ballHolder(s)?.pos).toEqual(hex(6, 4));
+  });
+});
+
+describe('goal areas', () => {
+  const keys = (hs: Hex[]) => hs.map(hexKey).sort();
+
+  it('are the same size at both ends', () => {
+    expect(goalLine('home')).toHaveLength(3);
+    expect(goalLine('away')).toHaveLength(3);
+    expect(goalArea('home')).toHaveLength(goalArea('away').length);
+  });
+
+  it('mirror each other exactly', () => {
+    expect(keys(goalLine('away'))).toEqual(keys(goalLine('home').map(mirrorHex)));
+    expect(keys(goalArea('away'))).toEqual(keys(goalArea('home').map(mirrorHex)));
+  });
+
+  it('kick-off formations mirror each other', () => {
+    const s = createMatch({ seed: 1, kickoff: 'away' });
+    const home = s.robots.filter((r) => r.team === 'home').map((r) => r.pos);
+    const away = s.robots.filter((r) => r.team === 'away').map((r) => r.pos);
+    expect(away.slice(0, 4)).toEqual(home.slice(0, 4).map(mirrorHex));
   });
 });
 

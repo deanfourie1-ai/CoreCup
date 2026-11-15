@@ -555,9 +555,12 @@ function buildStadium(group: THREE.Group) {
 
 // ------------------------------------------------------------------ pitch
 
-export function buildPitch(): Pitch {
+export function buildPitch(opts: { painted?: PaintedPitchArt | null } = {}): Pitch {
   const group = new THREE.Group();
-  buildStadium(group);
+  // Code-drawn stadium, turf and goals. Hidden once the painted pitch art has loaded.
+  const dressing = new THREE.Group();
+  group.add(dressing);
+  buildStadium(dressing);
 
   const turf = new THREE.Mesh(
     new THREE.PlaneGeometry(TURF_HALF_W * 2, TURF_HALF_D * 2),
@@ -565,7 +568,7 @@ export function buildPitch(): Pitch {
   );
   turf.rotation.x = -Math.PI / 2;
   turf.position.y = 0;
-  group.add(turf);
+  dressing.add(turf);
 
   const all = pitchHexes();
   const homeArea = new Set(goalArea('home').map(hexKey));
@@ -702,26 +705,26 @@ export function buildPitch(): Pitch {
     const mouth = new THREE.Mesh(new THREE.PlaneGeometry(depth, z1 - z0), flat('#0b1a10', 0.45));
     mouth.rotation.x = -Math.PI / 2;
     mouth.position.set(x + (sign * depth) / 2, 0.01, (z0 + z1) / 2);
-    group.add(mouth);
+    dressing.add(mouth);
     // Back panel tinted in the defending team's colour.
     const back = new THREE.Mesh(new THREE.PlaneGeometry(z1 - z0, hgt * 0.6), flat(team, 0.18));
     back.rotation.y = -sign * Math.PI / 2;
     back.position.set(x + sign * depth, hgt * 0.3, (z0 + z1) / 2);
-    group.add(back);
+    dressing.add(back);
 
     const postMat = flat('#fffaf0');
     for (const z of [z0, z1]) {
       const post = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, hgt, 10), postMat);
       post.position.set(x, hgt / 2, z);
-      group.add(post);
+      dressing.add(post);
       const cap = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), flat(PITCH_COLOURS.gold));
       cap.position.set(x, hgt, z);
-      group.add(cap);
+      dressing.add(cap);
     }
     const bar = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, z1 - z0, 10), postMat);
     bar.rotation.x = Math.PI / 2;
     bar.position.set(x, hgt, (z0 + z1) / 2);
-    group.add(bar);
+    dressing.add(bar);
     const net: THREE.Vector3[] = [];
     const bx = x + sign * depth;
     for (let k = 0; k <= 12; k++) {
@@ -739,7 +742,7 @@ export function buildPitch(): Pitch {
         net.push(new THREE.Vector3(x + sign * depth * f, hgt - hgt * 0.4 * f, z), new THREE.Vector3(x + sign * depth * f, 0, z));
       }
     }
-    group.add(
+    dressing.add(
       new THREE.LineSegments(
         new THREE.BufferGeometry().setFromPoints(net),
         new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 }),
@@ -823,5 +826,73 @@ export function buildPitch(): Pitch {
   pathDots.renderOrder = 2;
   group.add(pathDots);
 
+  const painted = opts.painted === undefined ? PAINTED_PITCH : opts.painted;
+  if (painted) loadPaintedPitch(group, dressing, painted);
+
   return { group, hexMesh, hover, pathDots, goalCentre, setHighlights, setLanding };
+}
+
+// ------------------------------------------------------------------ painted pitch art
+
+/**
+ * Painted stadium art from the design agent, drawn for the match camera: one 3840 x 2880 background
+ * (stadium, grass, goal backs) plus the near post and net of each goal as transparent layers on the same canvas.
+ * See /mnt/project-files/pitch-redesign/design-agent-pitch-brief.md for the spec.
+ */
+export interface PaintedPitchArt {
+  background: string;
+  fronts: string[];
+}
+
+const ART = `${import.meta.env.BASE_URL}pitch/`;
+export const PAINTED_PITCH: PaintedPitchArt = {
+  background: `${ART}pitch_background.webp`,
+  fronts: [`${ART}goal_west_front.webp`, `${ART}goal_east_front.webp`],
+};
+
+/** Canvas size, its scale, and where the pitch centre sits on it (from the guide render). */
+const ART_W = 3840;
+const ART_H = 2880;
+const ART_PX_PER_UNIT = 125;
+const ART_CENTRE_Y = 1408.4;
+
+/**
+ * The match camera has no perspective, so a picture painted for it stays exact under any pan or zoom as long as
+ * it is a card facing the camera at the right scale. The background sits far behind the pitch; the goal fronts
+ * draw over the players (they only cover the posts, outside the playing hexes).
+ */
+function loadPaintedPitch(group: THREE.Group, dressing: THREE.Group, art: PaintedPitchArt) {
+  // Exact view direction of the lab camera: from target + (0, 0, 0.4) up to target + (0, 16, 20).
+  const tilt = Math.atan2(16, 19.6);
+  const up = new THREE.Vector3(0, Math.cos(tilt), -Math.sin(tilt));
+  const back = new THREE.Vector3(0, -Math.sin(tilt), -Math.cos(tilt));
+  // Screen point of the world origin in the guide render is (1920, ART_CENTRE_Y); the card centre is below it.
+  const centreDown = (ART_H / 2 - ART_CENTRE_Y) / ART_PX_PER_UNIT;
+  const card = (url: string, depth: number, front: boolean) =>
+    new Promise<THREE.Mesh>((resolve, reject) => {
+      new THREE.TextureLoader().load(
+        url,
+        (tex) => {
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.anisotropy = 4;
+          const m = new THREE.Mesh(
+            new THREE.PlaneGeometry(ART_W / ART_PX_PER_UNIT, ART_H / ART_PX_PER_UNIT),
+            new THREE.MeshBasicMaterial({ map: tex, transparent: front, depthWrite: false, depthTest: !front }),
+          );
+          m.rotation.x = -tilt;
+          m.position.copy(up).multiplyScalar(-centreDown).addScaledVector(back, depth);
+          m.renderOrder = front ? 10_000 : -10;
+          m.frustumCulled = false;
+          resolve(m);
+        },
+        undefined,
+        reject,
+      );
+    });
+  Promise.all([card(art.background, 60, false), ...art.fronts.map((u) => card(u, -2, true))])
+    .then(([bg, ...fronts]) => {
+      group.add(bg, ...fronts);
+      dressing.visible = false;
+    })
+    .catch((err) => console.warn('Painted pitch art not loaded; keeping the code-drawn stadium.', err));
 }

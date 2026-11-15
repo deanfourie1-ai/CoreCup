@@ -198,10 +198,12 @@ def main():
     ap.add_argument("src", type=Path)
     ap.add_argument("out", type=Path)
     ap.add_argument("--character", default="kitsune10")
-    ap.add_argument("--canvas", default="256x352", help="frame size, e.g. 320x384 (feet stay 11 px above the bottom)")
+    ap.add_argument("--canvas", default="256x352", help="frame size, e.g. 320x384")
+    ap.add_argument("--pivot-y", type=int, default=None,
+                    help="foot line y (default: 11 px above the bottom; the 320x384 SE test uses 330)")
     args = ap.parse_args()
     W, H = (int(v) for v in args.canvas.split("x"))
-    PIVOT = (W // 2, H - 11)
+    PIVOT = (W // 2, args.pivot_y if args.pivot_y is not None else H - 11)
     char, src, out = args.character, args.src, args.out
     rep = Report()
     notes = json.loads((src / "notes.json").read_text()) if (src / "notes.json").exists() else {}

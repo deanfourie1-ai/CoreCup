@@ -12,6 +12,9 @@ import { hexToWorld } from './pitch';
 
 /** World height of the whole 256x352 frame; the character is ~86% of it (about 1.15 hex widths tall). */
 export const FRAME_WORLD_H = 2.3;
+/** World units per frame pixel. Fixed (2.3 units per 352 px), so a taller canvas adds headroom
+ *  around her instead of shrinking her. */
+export const WORLD_PER_PX = FRAME_WORLD_H / 352;
 const RUN_SPEED = 3.8; // world units per second (about 2.2 hexes a second)
 /** How often animated gear (glows, flames) is redrawn between frame changes. */
 const GLOW_HZ = 12;
@@ -64,7 +67,7 @@ export class SpritePlayer {
     this.texture.minFilter = THREE.LinearMipmapLinearFilter;
     this.texture.anisotropy = 4;
 
-    this.k = FRAME_WORLD_H / h;
+    this.k = WORLD_PER_PX;
     const geo = new THREE.PlaneGeometry(w * this.k, h * this.k);
     // PlaneGeometry is centred; move it so the foot pivot sits at the mesh origin.
     const [px, py] = sheet.pivot;
@@ -96,6 +99,18 @@ export class SpritePlayer {
     );
     this.shadow.renderOrder = 3;
     this.redraw(0);
+  }
+
+  /** Screen-space corners of this player's quad, for keeping the whole sprite in view. */
+  quadCorners(): THREE.Vector3[] {
+    const box = this.mesh.geometry.boundingBox ?? (this.mesh.geometry.computeBoundingBox(), this.mesh.geometry.boundingBox!);
+    this.mesh.updateMatrixWorld();
+    return [
+      [box.min.x, box.min.y],
+      [box.max.x, box.min.y],
+      [box.min.x, box.max.y],
+      [box.max.x, box.max.y],
+    ].map(([x, y]) => this.mesh.localToWorld(new THREE.Vector3(x, y, 0)));
   }
 
   get moving(): boolean {

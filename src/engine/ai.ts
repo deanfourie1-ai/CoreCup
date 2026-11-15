@@ -2,7 +2,7 @@
 // opponent and lets whole matches run headless for tests and the simulator.
 // It does not look ahead; a smarter AI comes in a later build step.
 
-import { distance, type Hex } from './hex';
+import { clampCol, distance, type Hex } from './hex';
 import {
   ballHolder,
   goalArea,
@@ -111,8 +111,7 @@ export function createSimpleAI(seed: number): Controller {
       // Someone holds the ball.
       if (holder!.team === r.team) {
         const ahead = targetGoal(r.team).col > holder!.pos.col ? 3 : -3;
-        const col = Math.max(0, Math.min(12, holder!.pos.col + ahead));
-        return towards(r, legal, { col, row: r.pos.row });
+        return towards(r, legal, { col: clampCol(holder!.pos.col + ahead, r.pos.row), row: r.pos.row });
       }
       const chasers = s.robots
         .filter((t) => t.team === r.team && t.role !== 'Keeper')
@@ -120,7 +119,7 @@ export function createSimpleAI(seed: number): Controller {
         .slice(0, 2);
       if (chasers.includes(r)) return towards(r, legal, holder!.pos);
       const own = ownGoal(r.team);
-      return towards(r, legal, { col: Math.round((holder!.pos.col + own.col) / 2), row: holder!.pos.row });
+      return towards(r, legal, { col: clampCol(Math.round((holder!.pos.col + own.col) / 2), holder!.pos.row), row: holder!.pos.row });
     },
     chooseReaction: () => true,
     chooseCorner: () => CORNERS[Math.floor(rng.next() * 3)],

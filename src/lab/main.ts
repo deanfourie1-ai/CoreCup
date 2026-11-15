@@ -4,7 +4,7 @@
 // brief asks for (64 px legibility, six facings, ten sprites).
 
 import * as THREE from 'three';
-import { DIRECTIONS, PITCH_COLS, sameHex, neighbours, hexKey, type Direction, type Hex } from '../engine/hex';
+import { DIRECTIONS, PITCH_ROWS, rowLength, sameHex, neighbours, hexKey, type Direction, type Hex } from '../engine/hex';
 import { loadSpriteSheet, resolveFrame, type SpriteSheet } from '../sprites/atlas';
 import { composeFrame } from '../sprites/compose';
 import { facingFor } from '../sprites/facing';
@@ -390,7 +390,8 @@ crowdToggle.addEventListener('change', () => {
   if (crowdToggle.checked) {
     const taken = new Set(players.map((p) => hexKey(p.hex)));
     while (crowd.length < 9) {
-      const h = { col: Math.floor(rand() * PITCH_COLS), row: Math.floor(rand() * 9) };
+      const row = Math.floor(rand() * PITCH_ROWS);
+      const h = { col: Math.floor(rand() * rowLength(row)), row };
       if (taken.has(hexKey(h))) continue;
       taken.add(hexKey(h));
       const p = addPlayer(h, randomLoadout(rand));
@@ -510,7 +511,8 @@ function tick() {
   // Crowd copies wander so the ten-sprite test is busy.
   for (const p of crowd) {
     if (!p.moving && p.action === 'loco_idle' && rand() < dt * 0.6) {
-      const h = { col: Math.floor(rand() * PITCH_COLS), row: Math.floor(rand() * 9) };
+      const row = Math.floor(rand() * PITCH_ROWS);
+      const h = { col: Math.floor(rand() * rowLength(row)), row };
       p.runTo(findPath(p.hex, h));
     }
   }

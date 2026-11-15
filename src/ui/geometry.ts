@@ -3,7 +3,8 @@ import { PITCH_COLS, PITCH_ROWS, type Hex } from '../engine';
 export const R = 26; // hex radius in pixels
 const W = Math.sqrt(3) * R;
 export const PAD = 8;
-export const BOARD_W = Math.ceil(W * (PITCH_COLS + 0.5) + PAD * 2);
+// Long rows are PITCH_COLS wide; the shorter odd rows sit half a hex in at each end.
+export const BOARD_W = Math.ceil(W * PITCH_COLS + PAD * 2);
 export const BOARD_H = Math.ceil(R * 1.5 * (PITCH_ROWS - 1) + R * 2 + PAD * 2);
 
 export function centre(h: Hex): { x: number; y: number } {

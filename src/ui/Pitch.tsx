@@ -1,4 +1,4 @@
-import { goalArea, hexKey, targetGoal, PITCH_COLS, PITCH_ROWS, type Hex, type MatchState } from '../engine';
+import { goalArea, goalLine, hexKey, pitchHexes, targetGoal, type Hex, type MatchState } from '../engine';
 import { BOARD_H, BOARD_W, centre, hexPoints, R } from './geometry';
 
 export interface Highlight {
@@ -17,8 +17,8 @@ export function Pitch(props: {
   const { state, active, highlights, onHex } = props;
   const marks = new Map(highlights.map((h) => [hexKey(h.hex), h.tone]));
   const goalHexes = new Set([...goalArea('home'), ...goalArea('away')].map(hexKey));
-  const hexes: Hex[] = [];
-  for (let row = 0; row < PITCH_ROWS; row++) for (let col = 0; col < PITCH_COLS; col++) hexes.push({ col, row });
+  const goalLineHexes = new Set([...goalLine('home'), ...goalLine('away')].map(hexKey));
+  const hexes = pitchHexes();
 
   const ball = state.ball;
   const holder = ball.state === 'held' ? state.robots.find((r) => r.id === ball.by) : undefined;
@@ -30,8 +30,8 @@ export function Pitch(props: {
     <svg className="pitch" viewBox={`0 0 ${BOARD_W} ${BOARD_H}`} role="img" aria-label="The pitch">
       {hexes.map((h) => {
         const tone = marks.get(hexKey(h));
-        const goalLine = (h.col === 0 || h.col === PITCH_COLS - 1) && h.row >= 3 && h.row <= 5;
-        const cls = ['hex', goalHexes.has(hexKey(h)) ? 'area' : '', goalLine ? 'goal' : '', tone ?? ''].join(' ');
+        const onGoalLine = goalLineHexes.has(hexKey(h));
+        const cls = ['hex', goalHexes.has(hexKey(h)) ? 'area' : '', onGoalLine ? 'goal' : '', tone ?? ''].join(' ');
         return <polygon key={hexKey(h)} className={cls} points={hexPoints(h, R - 1)} onClick={() => onHex(h)} />;
       })}
 

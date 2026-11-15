@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { distance, hexesWithin, line, neighbours, scatterDirection, step } from './hex';
+import {
+  distance,
+  hexesWithin,
+  inPitch,
+  line,
+  mirrorHex,
+  neighbours,
+  pitchHexes,
+  rowLength,
+  scatterDirection,
+  step,
+} from './hex';
 
 describe('hex grid', () => {
   it('measures distance in hex steps', () => {
@@ -38,5 +49,26 @@ describe('hex grid', () => {
 
   it('finds hexes within range on the pitch', () => {
     expect(hexesWithin({ col: 6, row: 4 }, 1)).toHaveLength(7);
+  });
+});
+
+describe('pitch shape', () => {
+  it('has 13 hexes in even rows and 12 in odd rows', () => {
+    expect(rowLength(0)).toBe(13);
+    expect(rowLength(1)).toBe(12);
+    expect(pitchHexes()).toHaveLength(5 * 13 + 4 * 12);
+    expect(inPitch({ col: 12, row: 4 })).toBe(true);
+    expect(inPitch({ col: 12, row: 3 })).toBe(false);
+  });
+
+  it('is a mirror image end to end', () => {
+    // Screen x of a hex centre, in hex widths.
+    const x = (h: { col: number; row: number }) => h.col + 0.5 * (h.row & 1);
+    for (const h of pitchHexes()) {
+      const m = mirrorHex(h);
+      expect(inPitch(m)).toBe(true);
+      expect(x(h) + x(m)).toBe(12);
+      expect(neighbours(m)).toHaveLength(neighbours(h).length);
+    }
   });
 });

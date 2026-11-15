@@ -4,6 +4,10 @@
 // shifted half a hex to the right. Pointy tops give each hex one side facing
 // straight at each goal, which keeps the d6 scatter rule simple.
 //
+// Even rows hold 13 hexes and odd rows hold 12, so the shifted rows stop half a
+// hex short at both ends and the pitch is a mirror image end to end. (With 13
+// in every row the right-hand end stuck out and its goal area was smaller.)
+//
 // `Hex` is the board position people see (column, row). Maths happens in axial
 // coordinates (q, r) and is converted back.
 
@@ -17,8 +21,30 @@ interface Axial {
   r: number;
 }
 
+/** Hexes in the long (even) rows. Odd rows hold one fewer. */
 export const PITCH_COLS = 13;
 export const PITCH_ROWS = 9;
+
+/** How many hexes a row holds: 13 in even rows, 12 in odd rows. */
+export function rowLength(row: number): number {
+  return row & 1 ? PITCH_COLS - 1 : PITCH_COLS;
+}
+
+/** The last column of a row (the East touchline end). */
+export const lastCol = (row: number): number => rowLength(row) - 1;
+
+/** The hex in the same spot seen from the other end of the pitch (West <-> East). */
+export const mirrorHex = (h: Hex): Hex => ({ col: lastCol(h.row) - h.col, row: h.row });
+
+/** Every hex on the pitch, row by row. */
+export function pitchHexes(): Hex[] {
+  const out: Hex[] = [];
+  for (let row = 0; row < PITCH_ROWS; row++) for (let col = 0; col < rowLength(row); col++) out.push({ col, row });
+  return out;
+}
+
+/** The nearest on-pitch column in a row (for aiming at a spot past the edge). */
+export const clampCol = (col: number, row: number): number => Math.max(0, Math.min(lastCol(row), col));
 
 export const hexKey = (h: Hex): string => `${h.col},${h.row}`;
 export const sameHex = (a: Hex, b: Hex): boolean => a.col === b.col && a.row === b.row;
@@ -44,8 +70,8 @@ const AXIAL_STEP: Record<Direction, Axial> = {
   NE: { q: 1, r: -1 },
 };
 
-export function inPitch(h: Hex, cols = PITCH_COLS, rows = PITCH_ROWS): boolean {
-  return h.col >= 0 && h.col < cols && h.row >= 0 && h.row < rows;
+export function inPitch(h: Hex): boolean {
+  return h.row >= 0 && h.row < PITCH_ROWS && h.col >= 0 && h.col < rowLength(h.row);
 }
 
 export function step(h: Hex, dir: Direction): Hex {
@@ -112,12 +138,5 @@ export function scatterDirection(roll: number, attacksEast: boolean): Direction 
 
 /** Every hex within `range` of `h` that is on the pitch. */
 export function hexesWithin(h: Hex, range: number): Hex[] {
-  const out: Hex[] = [];
-  for (let row = 0; row < PITCH_ROWS; row++) {
-    for (let col = 0; col < PITCH_COLS; col++) {
-      const c = { col, row };
-      if (distance(h, c) <= range) out.push(c);
-    }
-  }
-  return out;
+  return pitchHexes().filter((c) => distance(h, c) <= range);
 }

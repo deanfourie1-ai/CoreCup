@@ -179,8 +179,10 @@ export class SpritePlayer {
     const action = this.sheet.def.actions[this.action]!;
     this.frameClock += dt;
     // Lock the run cycle to ground speed so feet don't skate: one loop covers `stride_px` of ground.
-    const steps = action.views[resolveFrame(this.sheet.def, this.action, this.dir, 0).view]!.length;
-    const fps = action.stride_px && this.moving ? (steps * RUN_SPEED) / (action.stride_px * this.k) : action.fps;
+    const view = resolveFrame(this.sheet.def, this.action, this.dir, 0).view;
+    const steps = action.views[view]!.length;
+    const stride = action.stride_px_by_view?.[view] ?? action.stride_px;
+    const fps = stride && this.moving ? (steps * RUN_SPEED) / (stride * this.k) : action.fps;
     const frameDur = 1 / fps;
     while (this.frameClock >= frameDur && !this.finished) {
       this.frameClock -= frameDur;

@@ -16,7 +16,8 @@ export function Pitch(props: {
 }) {
   const { state, active, highlights, onHex } = props;
   const marks = new Map(highlights.map((h) => [hexKey(h.hex), h.tone]));
-  const goalHexes = new Set([...goalArea('home'), ...goalArea('away')].map(hexKey));
+  const homeArea = new Set(goalArea('home').map(hexKey));
+  const awayArea = new Set(goalArea('away').map(hexKey));
   const goalLineHexes = new Set([...goalLine('home'), ...goalLine('away')].map(hexKey));
   const hexes = pitchHexes();
 
@@ -31,7 +32,8 @@ export function Pitch(props: {
       {hexes.map((h) => {
         const tone = marks.get(hexKey(h));
         const onGoalLine = goalLineHexes.has(hexKey(h));
-        const cls = ['hex', goalHexes.has(hexKey(h)) ? 'area' : '', onGoalLine ? 'goal' : '', tone ?? ''].join(' ');
+        const area = homeArea.has(hexKey(h)) ? 'area home' : awayArea.has(hexKey(h)) ? 'area away' : '';
+        const cls = ['hex', area, onGoalLine ? 'goal' : '', tone ?? ''].join(' ');
         return <polygon key={hexKey(h)} className={cls} points={hexPoints(h, R - 1)} onClick={() => onHex(h)} />;
       })}
 

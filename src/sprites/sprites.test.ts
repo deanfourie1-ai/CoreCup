@@ -3,7 +3,7 @@ import { DIRECTIONS } from '../engine/hex';
 import { applyMatrix, frameCount, resolveFrame, stepMatrix } from './atlas';
 import { directionFromVector, facingFor } from './facing';
 import { SLOTS, tierCombinations } from './loadout';
-import { ANCHOR_NAMES, type ActionName, type SpriteSheetDef } from './schema';
+import { ANCHOR_NAMES, type ActionDef, type ActionName, type SpriteSheetDef } from './schema';
 import sheetJson from '../../public/sprites/playmaker10/cc_playmaker10.json';
 
 
@@ -23,6 +23,17 @@ describe('facing', () => {
   it('falls back to a view the action has, and never mirrors a straight-on front view', () => {
     expect(facingFor(sheet.actions.shot_power!, 'NW')).toEqual({ view: 'side', mirror: true });
     expect(facingFor(sheet.actions.loco_idle!, 'W')).toEqual({ view: 'front', mirror: false });
+  });
+
+  it('uses a drawn facing when there is one, and mirrors the opposite hand only as a fallback', () => {
+    const v = (names: string[]) => ({ fps: 10, loop: true, events: [], views: Object.fromEntries(names.map((n) => [n, [{ frame: 'x' }]])) }) as ActionDef;
+    const six = v(['e', 'se', 'sw', 'w', 'nw', 'ne']);
+    for (const [d, view] of [['E', 'e'], ['SE', 'se'], ['SW', 'sw'], ['W', 'w'], ['NW', 'nw'], ['NE', 'ne']] as const)
+      expect(facingFor(six, d)).toEqual({ view, mirror: false });
+    const right = v(['e', 'se', 'ne']);
+    expect(facingFor(right, 'W')).toEqual({ view: 'e', mirror: true });
+    expect(facingFor(right, 'SW')).toEqual({ view: 'se', mirror: true });
+    expect(facingFor(right, 'NW')).toEqual({ view: 'ne', mirror: true });
   });
 
   it('turns a ground vector into the nearest hex side', () => {

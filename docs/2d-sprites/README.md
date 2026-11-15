@@ -101,3 +101,10 @@ game logic, compositing and three.js, 47 draw calls. Frame rate there is capped 
 should be re-measured on a normal desktop browser with a GPU; it has not been yet.
 
 ![64 px strip](img/legibility-64px.png)
+
+## Round 2 tools
+
+- `docs/2d-sprites/delivery-spec.md`: what the artist delivers for #10 Kitsune (canvas, six facings, actions, layers, anchor dots, file names).
+- `python3 tools/sprites/import_delivery.py <delivery> <out>`: checks a delivery against the spec, reads the anchor dots, packs the atlas pages and writes the sprite JSON plus `import_report.md`.
+- `python3 tools/sprites/make_test_delivery.py <dir>`: builds a fake delivery from the Round 1 placeholder frames, to test the pipeline. Import it to `public/sprites/kitsune10_test` (git-ignored) and open `/sprite-lab.html?atlas=/sprites/kitsune10_test/cc_kitsune10.json`.
+- Fox Mirage ability test: press **M** or the Fox Mirage button in the Sprite Lab. The core tier picks Spark (one decoy that draws a reaction) or Ascended (two decoys and a swap). Surge gameplay is not approved, so it plays as Spark. Rendering only; the rules engine will drive it once abilities exist.

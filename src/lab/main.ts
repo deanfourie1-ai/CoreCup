@@ -11,6 +11,7 @@ import { facingFor } from '../sprites/facing';
 import { EMPTY_LOADOUT, PRESETS, SLOTS, TIER_LABELS, randomLoadout, type Loadout, type Tier } from '../sprites/loadout';
 import type { ActionName } from '../sprites/schema';
 import { buildPitch, hexToWorld, worldToHex } from './pitch';
+import { FoxMirage } from './mirage';
 import { SpritePlayer } from './player';
 import './lab.css';
 
@@ -201,7 +202,27 @@ renderer.domElement.addEventListener('click', (ev) => {
 
 window.addEventListener('keydown', (ev) => {
   if (ev.key === 's' || ev.key === 'S') shoot();
+  if (ev.key === 'm' || ev.key === 'M') castMirage();
 });
+
+// ------------------------------------------------------------------ Fox Mirage (Kitsune core ability)
+
+let mirage: FoxMirage | null = null;
+let pendingMirage = false;
+
+function castMirage() {
+  if (mirage || hero.action === 'shot_power') return;
+  if (hero.moving) {
+    pendingMirage = true;
+    return;
+  }
+  pendingMirage = false;
+  selected = hero;
+  syncGearUi();
+  mirage = new FoxMirage(scene, camera, hero, Math.max(1, hero.loadout.core) as Tier, players);
+  if (sheet.def.actions.ability) hero.setAction('ability');
+  flash(`Fox Mirage · ${mirage.tierName}${hero.loadout.core === 0 ? ' (no core fitted, shown at Spark)' : ''}`);
+}
 
 // ------------------------------------------------------------------ shooting
 
@@ -351,6 +372,7 @@ function applyPreview() {
 }
 
 document.getElementById('shoot')!.addEventListener('click', shoot);
+document.getElementById('mirage')!.addEventListener('click', castMirage);
 document.getElementById('reset')!.addEventListener('click', () => {
   preview = null;
   hero.setAction('loco_idle');
@@ -461,6 +483,11 @@ function tick() {
 
   for (const p of players) p.update(dt, elapsed);
   if (pendingShot && !hero.moving) shoot();
+  if (pendingMirage && !hero.moving) castMirage();
+  if (mirage) {
+    mirage.update(dt);
+    if (mirage.done) mirage = null;
+  }
 
   // Ball.
   if (ballState.kind === 'feet') {
@@ -539,6 +566,7 @@ async function boot() {
   hero = addPlayer({ col: 4, row: 4 }, { ...PRESETS.spike.loadout });
   hero.onEvent = onHeroEvent;
   hero.onActionEnd = (action, p) => {
+    if (action === 'ability') p.setAction('loco_idle');
     if (action === 'shot_power') {
       p.setAction('loco_idle');
       if (preview?.action === 'shot_power') setTimeout(() => preview && applyPreview(), 600);
@@ -550,7 +578,7 @@ async function boot() {
   resize();
   window.addEventListener('resize', resize);
   // Handle for browser automation and console poking.
-  (window as unknown as { lab: unknown }).lab = { players, hero: () => hero, camera, renderer, shoot, resetBall };
+  (window as unknown as { lab: unknown }).lab = { players, hero: () => hero, camera, renderer, shoot, resetBall, castMirage, mirageActive: () => !!mirage };
   requestAnimationFrame(tick);
 }
 

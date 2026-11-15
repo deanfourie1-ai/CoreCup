@@ -2,3 +2,9 @@ node_modules
 dist
 *.log
 .DS_Store
+public/sprites/kitsune10_test/
+__pycache__/
+public/sprites/kitsune10_se/
+public/sprites/kitsune10_se_b/
+public/sprites/kitsune10_rig/
+public/sprites/kitsune10_anime/

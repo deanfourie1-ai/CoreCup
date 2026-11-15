@@ -6,7 +6,7 @@
 // docs/2d-sprites/layered-upgrades.md for when a piece needs per-frame overlay
 // art instead.
 
-import type { Anchor, Anchors, ViewName } from './schema';
+import type { Anchor, Anchors, LegacyView } from './schema';
 import type { Loadout, Slot, Tier } from './loadout';
 
 const INK = '#2a1c18';
@@ -18,7 +18,8 @@ const EMBER = '#c4472a';
 export interface GearContext {
   ctx: CanvasRenderingContext2D;
   a: Anchors;
-  view: ViewName;
+  /** Body angle of the view (left-facing views are drawn flipped by the compositor). */
+  view: LegacyView;
   /** Seconds, for glow pulses and flames. */
   t: number;
   coreColour: string;
@@ -97,7 +98,7 @@ function glowStrip(g: GearContext, x0: number, y0: number, x1: number, y1: numbe
 // ---------------------------------------------------------------- head
 
 /** Where the near ear sits relative to the brow anchor, per view. */
-function earOffset(view: ViewName): [number, number] {
+function earOffset(view: LegacyView): [number, number] {
   switch (view) {
     case 'front':
       return [-24, 12];
@@ -552,8 +553,9 @@ const SLOT_DRAW: Partial<Record<Slot, (g: GearContext, tier: Tier, pass: Pass) =
 /** Layer order inside a pass, bottom to top. */
 export const GEAR_ORDER: Slot[] = ['legs', 'boots', 'arms', 'shoulders', 'head'];
 
-export function drawGearPass(g: GearContext, l: Loadout, pass: Pass) {
-  for (const slot of GEAR_ORDER) SLOT_DRAW[slot]?.(g, l[slot], pass);
+/** Draw the placeholder vector gear for one depth pass, skipping slots that have painted art. */
+export function drawGearPass(g: GearContext, l: Loadout, pass: Pass, hasArt: (slot: Slot) => boolean = () => false) {
+  for (const slot of GEAR_ORDER) if (!hasArt(slot)) SLOT_DRAW[slot]?.(g, l[slot], pass);
 }
 
 export function drawCoreAndFx(g: GearContext, l: Loadout) {

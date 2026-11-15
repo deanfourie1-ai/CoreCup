@@ -10,7 +10,13 @@ the ground moves under her by STRIDE_PX / 8 px per frame. In the image a planted
 slides BACKWARDS by exactly that much each frame, as seen by the game camera (see PLANT_SHIFT);
 once the game moves the sprite forward at ground speed, the foot stays still on the pitch.
 
-    python3 tools/sprites/make_pose_guides.py <out dir> [--dots-only]
+    python3 tools/sprites/make_pose_guides.py <out dir> [--dots-only] [--canvas 320x384 --pivot-y 330]
+                                              [--facings se]
+
+--canvas/--pivot-y: the taller SE test canvas (Nov 2026 correction brief). With 54 px below the foot
+line there is room for the full ground projection, so on diagonal facings the planted foot also
+moves UP the image (about 26 px a frame) and the forward foot lands below the line. On the old
+256x352 canvas (11 px below the feet) only the sideways part is drawn.
 
 --dots-only also writes the frames in delivery format (base = stick figure, plus _anchors and
 _anchors_back layers) so import_delivery.py can pack them and the lab can play the guide itself.
@@ -30,13 +36,16 @@ TILT = math.atan2(16, 20)  # game camera pitch, about 39 degrees
 FACINGS = {"e": 0, "se": 60, "sw": 120, "w": 180, "nw": 240, "ne": 300}
 
 
+DEPTH = False  # draw the ground's depth (up/down the image) too; set by --canvas with room below
+
+
 def plant_shift(facing):
     """Image px a planted foot moves each run frame (x right, y down).
 
-    Only the sideways part is drawn; the up/down part (diagonal facings) does not fit the canvas.
+    The up/down part is only drawn when DEPTH is on (taller canvas); otherwise it is 0.
     """
     a = math.radians(FACINGS[facing])
-    return (-STEP * math.cos(a), 0.0)
+    return (-STEP * math.cos(a), -STEP * math.sin(a) * math.sin(TILT) if DEPTH else 0.0)
 THIGH = SHIN = 84
 
 # Foot path per phase (forward px from the hip, height px). Phases 0-2 are stance:
@@ -51,7 +60,7 @@ FOOT = [
     (52, 34),
     (78, 10),
 ]
-HIP_BOB = [-4, -7, -2, 3, 5, 3, 0, -2]  # lowest at mid-stance, highest in flight
+HIP_BOB = [-4, -7, -1, 4, -4, -7, -1, 4]  # one bob per step: lowest at mid-stance (1, 5), highest in flight (3, 7)
 
 
 def knee(hip, foot, forward=1):
@@ -111,10 +120,9 @@ def project(p, facing):
     right = (-math.sin(a), math.cos(a))
     x = p[0] * fwd[0] + p[2] * right[0]
     z = p[0] * fwd[1] + p[2] * right[1]
-    # Feet stay on the foot line in every facing. Through the 39 degree camera a diagonal stride
-    # would also move the planted foot up or down the image (about 26 px a frame), but the canvas
-    # has only 11 px below the foot line, so that part is left to the game (see plant_shift).
-    return (PIVOT[0] + x, PIVOT[1] - p[1], z)
+    # Through the 39 degree camera, ground depth (towards the camera) shows as down the image.
+    # On the old canvas (11 px below the feet) that part is dropped and the feet stay on the line.
+    return (PIVOT[0] + x, PIVOT[1] - p[1] + (z * math.sin(TILT) if DEPTH else 0), z)
 
 
 def anchors(P, facing):
@@ -193,19 +201,33 @@ def guide_frame(action, facing, i, with_guides=True):
                 ph = (i + off) % 8
                 if ph <= 2:
                     x, y, _ = project(P[f"heel_{s}"], facing)
-                    d.text((x - 20, PIVOT[1] + 2), f"{s} planted", fill=(200, 40, 40, 255))
+                    d.text((x - 20, y + 6), f"{s} planted", fill=(200, 40, 40, 255))
         d.text((4, 4), f"{action} {facing} {i:02d}", fill=(40, 40, 40, 255))
     return img, A
 
 
 def main():
-    out = Path(sys.argv[1])
-    delivery = "--dots-only" in sys.argv
+    global W, H, PIVOT, DEPTH
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("out", type=Path)
+    ap.add_argument("--dots-only", action="store_true")
+    ap.add_argument("--canvas", default=None, help="e.g. 320x384")
+    ap.add_argument("--pivot-y", type=int, default=None)
+    ap.add_argument("--facings", default=",".join(FACINGS))
+    a = ap.parse_args()
+    if a.canvas:
+        W, H = (int(v) for v in a.canvas.split("x"))
+        PIVOT = (W // 2, a.pivot_y if a.pivot_y is not None else H - 11)
+    DEPTH = H - PIVOT[1] >= 40
+    facings = a.facings.split(",")
+    out = a.out
+    delivery = a.dots_only
     out.mkdir(parents=True, exist_ok=True)
     sheets = {}
     for action, n in (("idle", 4), ("run", 8)):
         rows = []
-        for facing in FACINGS:
+        for facing in facings:
             row = []
             for i in range(n):
                 g, A = guide_frame(action, facing, i)
@@ -234,7 +256,7 @@ def main():
         (out / "delivery" / "notes.json").write_text(
             '{"stride_px": %d, "core_colour": "#ff6f9e", "core_creature": "kitsune"}' % STRIDE_PX
         )
-    for f in FACINGS:
+    for f in facings:
         sx, sy = plant_shift(f)
         print(f"{f}: planted foot moves ({sx:+.0f}, {sy:+.0f}) px per frame")
     print(f"wrote guides to {out}")

@@ -466,6 +466,40 @@ let frameMsAvg = 16;
 const clock = new THREE.Clock();
 let stripClock = 0;
 const camTarget = new THREE.Vector3();
+const CAM_OFFSET = new THREE.Vector3(0, 16, 20);
+function placeCamera() {
+  camera.position.copy(camTarget).add(CAM_OFFSET);
+  camera.lookAt(camTarget.x, camTarget.y, camTarget.z + 0.4);
+  camera.updateMatrixWorld();
+}
+/** Safe area as a fraction of the half-viewport: the whole quad (feet to ponytail tip) stays inside it. */
+const SAFE = 0.92;
+/**
+ * The camera follow is a smooth drift, which can leave a running player's head past the screen
+ * edge when zoomed in. After the drift, shift the camera (directly, no easing) just enough that
+ * every corner of the player's quad is inside the safe area. If the quad is bigger than the safe
+ * area, centre it.
+ */
+function keepInView(p: SpritePlayer) {
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const c of p.quadCorners()) {
+    c.project(camera);
+    minX = Math.min(minX, c.x); maxX = Math.max(maxX, c.x);
+    minY = Math.min(minY, c.y); maxY = Math.max(maxY, c.y);
+  }
+  const fit = (lo: number, hi: number) =>
+    hi - lo > 2 * SAFE ? (lo + hi) / 2 : lo < -SAFE ? lo + SAFE : hi > SAFE ? hi - SAFE : 0;
+  const dx = fit(minX, maxX);
+  const dy = fit(minY, maxY);
+  if (dx === 0 && dy === 0) return;
+  // Orthographic: one NDC unit is half the view width/height in world units, along the camera's axes.
+  const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+  const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+  const sx = (camera.right - camera.left) / 2;
+  const sy = (camera.top - camera.bottom) / 2;
+  camTarget.addScaledVector(right, dx * sx).addScaledVector(up, dy * sy);
+  placeCamera();
+}
 let elapsed = 0;
 
 function tick() {
@@ -517,8 +551,8 @@ function tick() {
   // When zoomed in, the camera drifts towards the selected player.
   const follow = Math.min(1, Math.max(0, zoom - 1));
   camTarget.lerp(new THREE.Vector3(selected.pos.x * follow, 0, selected.pos.z * follow * 0.6), Math.min(1, dt * 4));
-  camera.position.set(camTarget.x, 16, 20 + camTarget.z);
-  camera.lookAt(camTarget.x, 0, 0.4 + camTarget.z);
+  placeCamera();
+  keepInView(selected);
 
   // Selection ring follows the selected player.
   ring.position.set(selected.pos.x, 0.09, selected.pos.z);

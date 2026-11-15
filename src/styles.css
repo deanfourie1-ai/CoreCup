@@ -135,40 +135,59 @@ body {
   }
 }
 
+/* Night-stadium turf to match the 3D pitch and the main menu: floodlit stripes, glowing lime hex lines,
+   Emberforge (west) and Tidewell (east) goal areas, cyan move / gold sprint / foxfire-pink target. */
 .pitch {
   width: 100%;
   height: auto;
-  background: var(--grass-alt);
   border-radius: 8px;
+  border: 2px solid #f2c25a;
+  box-sizing: border-box;
+  background:
+    radial-gradient(60% 70% at 50% 50%, rgba(230, 255, 220, 0.12), transparent 70%),
+    radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(18, 11, 29, 0.55)),
+    repeating-linear-gradient(90deg, #33914a 0 45px, #27783c 45px 90px);
+  box-shadow: 0 0 0 4px #241232, 0 0 28px rgba(255, 79, 154, 0.25);
 }
 
 .hex {
-  fill: var(--grass);
-  stroke: var(--grass-alt);
-  stroke-width: 1;
+  fill: rgba(0, 0, 0, 0.12);
+  stroke: rgba(233, 247, 196, 0.5);
+  stroke-width: 1.5;
 }
 
-.hex.area {
-  fill: #2b6544;
+.hex.area.home {
+  fill: rgba(255, 122, 60, 0.2);
+  stroke: #ff7a3c;
+}
+
+.hex.area.away {
+  fill: rgba(51, 194, 208, 0.2);
+  stroke: #33c2d0;
 }
 
 .hex.goal {
-  fill: #e9e6da;
-  opacity: 0.85;
+  fill: rgba(246, 239, 217, 0.35);
 }
 
 .hex.move {
-  fill: #4fae6d;
+  fill: rgba(191, 247, 255, 0.4);
+  stroke: #bff7ff;
+  stroke-width: 2.5;
   cursor: pointer;
 }
 
 .hex.sprint {
-  fill: #b59a3b;
+  fill: rgba(255, 211, 107, 0.38);
+  stroke: #ffd36b;
+  stroke-width: 2.5;
   cursor: pointer;
 }
 
 .hex.target {
-  fill: #5a7fc0;
+  fill: rgba(255, 95, 168, 0.38);
+  stroke: #ff5fa8;
+  stroke-width: 2.5;
   cursor: pointer;
 }
 
@@ -206,7 +225,7 @@ body {
 
 .landing polygon {
   fill: none;
-  stroke: #fff;
+  stroke: #ff5fa8;
   stroke-width: 3;
   stroke-dasharray: 5 4;
 }

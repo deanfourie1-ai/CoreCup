@@ -103,6 +103,8 @@ export interface ActionDef {
    * When set, playback speed follows movement speed so the feet don't slide.
    */
   stride_px?: number;
+  /** Per-facing override of stride_px, for facings drawn with a different stride or frame count. */
+  stride_px_by_view?: Partial<Record<ViewName, number>>;
   views: Partial<Record<ViewName, ActionFrame[]>>;
   events: SpriteEvent[];
 }

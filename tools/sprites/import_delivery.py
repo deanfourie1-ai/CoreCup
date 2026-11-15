@@ -9,7 +9,8 @@ Reads:
     cc_<char>_<action>_<facing>_<nn>_anchors_back.png       anchor dots behind the body
     cc_<char>_<action>_<facing>_<nn>_gear_<slot>_mk<n>.png  painted (bending) gear overlays
     cc_gear_<slot>_mk<n>_<facing>[_L|_R].png                rigid gear pieces
-    notes.json                                              stride, contact frames, core colour, gear pivots
+    notes.json                                              stride (stride_px, optional stride_px_by_facing),
+                                                            contact frames, core colour, gear pivots
 
 Writes:
     cc_<char>_atlas_<page>.png, cc_<char>.json (src/sprites/schema.ts), import_report.md
@@ -291,6 +292,9 @@ def main():
             act["stride_px"] = int(notes.get("stride_px", 380))
             if "stride_px" not in notes:
                 rep.warn("run: stride_px not given in notes.json, assuming 380")
+            by_view = {f: int(v) for f, v in notes.get("stride_px_by_facing", {}).items() if f in views}
+            if by_view:
+                act["stride_px_by_view"] = by_view
         actions[game_name] = act
 
     # Rigid gear pieces.

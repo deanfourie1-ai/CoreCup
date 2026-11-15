@@ -53,7 +53,7 @@ export function MainMenu({ onKickOff }: { onKickOff: () => void }) {
   return (
     <div className="mm">
       <div className="mm-hero" aria-hidden="true">
-        <img src={`${ART}hero-kitsune.webp`} alt="" />
+        <img src={`${ART}key-art-kitsune.webp`} alt="" />
       </div>
       <Embers />
       <div className="mm-shade" aria-hidden="true" />

@@ -24,9 +24,10 @@ export {
   targetGoal,
   inOwnGoalArea,
   inReactionWindow,
+  isOverheated,
   passRange,
   reachable,
   otherTeam,
   attacksEast,
 } from './match';
-export { createSimpleAI } from './ai';
+export { createSimpleAI, towards, keeperPlay } from './ai';

@@ -23,6 +23,7 @@ describe('human session', () => {
     carrier.pos = { col: 8, row: 4 };
     carrier.tick = 0;
     s.ball = { state: 'held', by: 'away-4' };
+    s.kickoff = null;
     const defender = robotById(s, 'home-1');
     defender.pos = { col: 6, row: 3 };
     defender.tick = 1;

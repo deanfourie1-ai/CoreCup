@@ -47,6 +47,7 @@ function arena(): MatchState {
     r.pos = r.team === 'home' ? hex(i, 0) : hex(12 - (i - 5), 8);
   });
   s.ball = { state: 'loose', at: hex(6, 8) };
+  s.kickoff = null;
   return s;
 }
 
@@ -393,5 +394,61 @@ describe('halves and full time', () => {
     expect(a.log.length).toBe(b.log.length);
     const goals = a.log.filter((e) => e.t === 'goal').length;
     expect(goals).toBe(a.score.home + a.score.away);
+  });
+});
+
+describe('kick-off protection and half time', () => {
+  it('lets the kick-off taker act first, even when it is behind on the track', () => {
+    const s = createMatch({ seed: 5 });
+    const taker = robotById(s, s.kickoff!.taker);
+    taker.tick = 6;
+    expect(activeRobot(s)?.id).toBe(taker.id);
+    const after = step(s, both(coach({}), coach({})));
+    // It held, so it paid 2 ticks; protection stays on until it moves, passes or shoots.
+    expect(robotById(after, taker.id).tick).toBe(8);
+    expect(after.kickoff).toEqual({ taker: taker.id, acted: true });
+  });
+
+  it('keeps opponents in their own half, 2 hexes from the ball, with no tackle', () => {
+    const s = createMatch({ seed: 5 });
+    s.kickoff!.acted = true;
+    const taker = robotById(s, s.kickoff!.taker);
+    const opp = robotById(s, 'away-4');
+    opp.pos = hex(taker.pos.col + 1, taker.pos.row);
+    const legal = legalActions(s, opp.id);
+    expect(legal.some((a) => a.type === 'tackle')).toBe(false);
+    for (const a of legal) {
+      if (a.type !== 'move' && a.type !== 'sprint') continue;
+      expect(a.to.col).toBeGreaterThanOrEqual(6);
+    }
+    s.kickoff = null;
+    expect(legalActions(s, opp.id).some((a) => a.type === 'tackle')).toBe(true);
+  });
+
+  it('ends protection when the taker moves', () => {
+    const s = createMatch({ seed: 5 });
+    const taker = robotById(s, s.kickoff!.taker);
+    const move = legalActions(s, taker.id).find((a) => a.type === 'move')!;
+    const after = step(s, both(coach({ actions: [move] }), coach({})));
+    expect(after.kickoff).toBeNull();
+  });
+
+  it('clears overheat at half time and gives the second-half kick-off to the other team', () => {
+    const s = arena();
+    s.robots.forEach((r) => {
+      r.tick = 30;
+      r.overheatUntil = 40;
+    });
+    s.clock = 29;
+    const after = step(s, both(coach({}), coach({})));
+    expect(after.half).toBe(2);
+    expect(after.robots.every((r) => r.overheatUntil === null)).toBe(true);
+    expect(robotById(after, after.kickoff!.taker).team).toBe('away');
+  });
+
+  it('logs the coin toss winner, who kicks off', () => {
+    const s = createMatch({ seed: 5, kickoff: 'away', coinToss: true });
+    expect(s.log[0]).toEqual({ t: 'coin', winner: 'away' });
+    expect(robotById(s, s.kickoff!.taker).team).toBe('away');
   });
 });

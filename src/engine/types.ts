@@ -50,6 +50,8 @@ export interface ShotFlight {
   from: Hex;
   /** Shot dice before the chip bonus and keeper modifiers. */
   dice: number;
+  /** How `dice` was built from the shooter's Power, for the dice moment on screen. */
+  diceMods?: RollMod[];
   landTick: number;
 }
 
@@ -69,6 +71,12 @@ export type Action =
   | { type: 'intercept'; robot: string }
   | { type: 'hold'; robot: string };
 
+/** One line on a roll's modifier list ("-1 Distance"). */
+export interface RollMod {
+  label: string;
+  value: number;
+}
+
 export type ReactionKind = 'intercept' | 'challenge' | 'block' | 'dive';
 
 export type ShotOutcome = 'goal' | 'post' | 'cleared' | 'save';
@@ -76,7 +84,19 @@ export type ShotOutcome = 'goal' | 'post' | 'cleared' | 'save';
 export type MatchEvent =
   | { t: 'action'; tick: number; action: Action }
   | { t: 'reaction'; tick: number; robot: string; kind: ReactionKind }
-  | { t: 'roll'; robot: string; purpose: string; dice: number[]; hits: number }
+  | {
+      t: 'roll';
+      robot: string;
+      purpose: string;
+      dice: number[];
+      hits: number;
+      /** The stat dice before modifiers (e.g. Control 4). */
+      base?: number;
+      baseLabel?: string;
+      mods?: RollMod[];
+      /** Hits this roll needs on its own (a pass's distance band), when there is a fixed target. */
+      need?: number;
+    }
   | { t: 'possession'; robot: string | null; at: Hex }
   | {
       t: 'shot';
@@ -89,6 +109,7 @@ export type MatchEvent =
       keeperCorner: Corner | null;
     }
   | { t: 'goal'; team: TeamId; score: Score }
+  | { t: 'coin'; winner: TeamId }
   | { t: 'halftime' }
   | { t: 'fulltime'; score: Score };
 
@@ -109,6 +130,11 @@ export interface MatchState {
   /** Wins the next timeline tie that comes down to teams; flips when used. */
   tieFlip: TeamId;
   firstKickoff: TeamId;
+  /**
+   * Kick-off protection: set by every kick-off reset. The taker acts first whatever the track says; until it has
+   * moved, passed or shot, opponents stay in their own half and at least 2 hexes from the ball.
+   */
+  kickoff?: { taker: string; acted: boolean } | null;
   log: MatchEvent[];
 }
 

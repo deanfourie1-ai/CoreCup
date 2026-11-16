@@ -42,6 +42,8 @@ export function resetForKickoff(state: MatchState, kickoff: TeamId): void {
       .filter((r) => r.team === team)
       .forEach((r, i) => {
         r.pos = spots[i];
+        // Walls, auras, decoys and charged shots end at a goal or half time.
+        r.effect = null;
       });
   }
   const striker = state.robots.find((r) => r.team === kickoff && r.role === 'Striker');
@@ -60,6 +62,8 @@ function buildTeam(club: ClubDef, team: TeamId): Robot[] {
     pos: { col: 0, row: 0 },
     tick: 0,
     overheatUntil: null,
+    tier: p.tier ?? 1,
+    effect: null,
   }));
 }
 

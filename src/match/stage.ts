@@ -8,6 +8,7 @@
 
 import * as THREE from 'three';
 import {
+  ABILITIES,
   goalArea,
   hexKey,
   neighbours,
@@ -21,6 +22,7 @@ import {
 } from '../engine';
 import { buildPitch, hexToWorld, worldToHex, PITCH_COLOURS, type HighlightTone, type Pitch } from '../lab/pitch';
 import { loadSpriteSheet, type SpriteSheet } from '../sprites/atlas';
+import { AbilityFx } from './ability-fx';
 import { RUN, SpriteActor, TokenActor, type Actor } from './actors';
 import { CHARACTER_ART } from './art';
 
@@ -146,13 +148,14 @@ export class MatchStage {
   private readonly pitch: Pitch;
   private readonly ball = makeBall();
   private readonly actors = new Map<string, Actor>();
+  private readonly fx: AbilityFx;
   private readonly sheets = new Map<string, SpriteSheet>();
   private readonly activeRing: THREE.Mesh;
   private nameTag: THREE.Sprite | null = null;
   private nameTagFor = '';
   private landingTag: THREE.Sprite | null = null;
   private landingKey = '';
-  private callouts: { s: THREE.Sprite; t: number; base: THREE.Vector3 }[] = [];
+  private callouts: { s: THREE.Sprite; t: number; base: THREE.Vector3; robot?: string }[] = [];
   private banner: HTMLDivElement;
   private bannerTimer = 0;
   private state: MatchState | null = null;
@@ -190,6 +193,7 @@ export class MatchStage {
     this.camera.lookAt(0, 0, 0.4);
     this.camera.updateMatrixWorld();
 
+    this.fx = new AbilityFx(this.scene, this.actors);
     this.pitch = buildPitch();
     this.scene.add(this.pitch.group);
     this.scene.add(this.ball.sprite, this.ball.shadow);
@@ -294,6 +298,8 @@ export class MatchStage {
       this.actors.set(r.id, actor);
       this.scene.add(...actor.objects);
     }
+    this.fx.clear();
+    this.fx.sync(state);
     this.ballScript = null;
     this.flightStart = null;
     const target = this.ballTarget(state);
@@ -305,8 +311,18 @@ export class MatchStage {
   private animate(prev: MatchState, s: MatchState) {
     const events = s.log.slice(prev.log.length);
     const moveAction = new Map<string, { to: Hex; steps: number; sprint: boolean }>();
+    /** Runs made by an ability (Unchained Dash, Labyrinth Charge), hex by hex. */
+    const abilityRun = new Map<string, Hex[]>();
     let reset = false;
     for (const e of events) {
+      if (e.t === 'ability') {
+        const colour = ABILITIES[e.core]?.colour ?? PITCH_COLOURS.gold;
+        this.callout(e.robot, `${e.name}!`, colour);
+        this.fx.burst(e.robot, colour);
+        if (e.path?.length) abilityRun.set(e.robot, e.path);
+      }
+      if (e.t === 'decoy') this.callout(e.robot, 'Fooled!', ABILITIES.Kitsune.colour);
+      if (e.t === 'walled') this.hexCallout(e.at, e.what === 'shot' ? 'Walled off!' : 'Stopped by the wall!', '#f0e2c0');
       if (e.t === 'action') {
         const a = e.action;
         if (a.type === 'move') moveAction.set(a.robot, { to: a.to, steps: 1, sprint: false });
@@ -333,7 +349,11 @@ export class MatchStage {
       const was = prev.robots.find((x) => x.id === r.id);
       if (!actor || !was || sameHex(was.pos, r.pos)) continue;
       const mv = moveAction.get(r.id);
-      if (mv && !reset) {
+      const run = abilityRun.get(r.id);
+      if (run && !reset) {
+        const end = run.findIndex((h) => sameHex(h, r.pos));
+        actor.runTo(end >= 0 ? run.slice(0, end + 1) : [...run, r.pos], RUN * 1.6);
+      } else if (mv && !reset) {
         const full = reachable(prev, was, mv.steps).get(hexKey(mv.to)) ?? [was.pos, mv.to];
         // A lost Challenge stops the walk early: run only as far as the robot got.
         const end = full.findIndex((h) => sameHex(h, r.pos));
@@ -345,6 +365,7 @@ export class MatchStage {
       }
     }
     if (reset) this.settleTimer = Math.max(this.settleTimer, 0.4);
+    this.fx.sync(s);
   }
 
   /** The ball's finish for a shot: into the net, against the post, cleared away, or into the keeper's hands. */
@@ -382,7 +403,17 @@ export class MatchStage {
     const a = this.actors.get(robotId);
     if (!a) return;
     const s = textSprite(text, { colour, height: 0.7 });
-    const base = a.pos.clone().setY(a.height + 0.75);
+    // Stack callouts that land on the same robot together ("Tentacle Grab!" then "Fooled!").
+    const stacked = this.callouts.filter((c) => c.robot === robotId && c.t < 0.9).length;
+    const base = a.pos.clone().setY(a.height + 0.75 + stacked * 0.6);
+    s.position.copy(base);
+    this.scene.add(s);
+    this.callouts.push({ s, t: 0, base, robot: robotId });
+  }
+
+  private hexCallout(h: Hex, text: string, colour: string) {
+    const s = textSprite(text, { colour, height: 0.6 });
+    const base = hexToWorld(h).setY(1.2);
     s.position.copy(base);
     this.scene.add(s);
     this.callouts.push({ s, t: 0, base });
@@ -542,6 +573,7 @@ export class MatchStage {
         a.update(dt, this.elapsed);
       }
       this.updateBall(dt);
+      this.fx.update(dt, this.elapsed);
     }
 
     if (this.settleTimer > 0) this.settleTimer -= dt;

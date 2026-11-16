@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  abilityChoice,
+  abilityOf,
   activeRobot,
   createMatch,
   createSimpleAI,
+  isOverheated,
   legalActions,
   robotById,
   RULES,
   sameHex,
+  TIER_NAMES,
   type Action,
   type Hex,
   type MatchState,
@@ -58,7 +62,8 @@ function Seg<T extends string | boolean>(props: { value: T; options: [T, string]
   );
 }
 
-type Mode = 'move' | PassKind;
+/** 'ability': picking the hex for an ability (Web Pass target, Unchained Dash or Labyrinth Charge end). */
+type Mode = 'move' | PassKind | 'ability';
 type Coin = 'heads' | 'tails';
 
 const REACTION_WORDS = {
@@ -173,6 +178,13 @@ export function MatchScreen() {
   const passFor = (o: (typeof passOptions)[number]) =>
     of('pass').find((a) => a.kind === o.kind && sameHex(a.to, o.to));
   const wait = of('hold')[0];
+  const abilityActs = of('ability');
+  const ability = me ? abilityOf(me.core) : undefined;
+  const abilityHexes = abilityActs.filter((a) => a.to);
+  const abilityTargets = abilityActs.filter((a) => a.target);
+  const abilityPlain = abilityActs.filter((a) => !a.to && !a.target);
+  const goodMoment = me && abilityActs.length ? abilityChoice(state, me, legal) : null;
+  const abilityCost = me ? RULES.abilityCost[me.tier] : 0;
   /** What the pitch shows: the state before the step while its dice moment is playing. */
   const shown = dice ? dice.before : state;
 
@@ -183,7 +195,10 @@ export function MatchScreen() {
     // Suggested passes to teammates light up too: one click on a teammate plays it.
     for (const o of passOptions) if (o.receiver) highlights.push({ hex: o.to, tone: 'target' });
   }
-  if (me && mode !== 'move') {
+  if (me && mode === 'ability') {
+    const tone = me.core === 'Anansi' ? 'target' : 'sprint';
+    for (const a of abilityHexes) highlights.push({ hex: a.to!, tone });
+  } else if (me && mode !== 'move') {
     for (const a of of('pass')) if (a.kind === mode) highlights.push({ hex: a.to, tone: 'target' });
   }
 
@@ -198,6 +213,11 @@ export function MatchScreen() {
 
   function onHex(h: Hex) {
     if (!me) return;
+    if (mode === 'ability') {
+      const a = abilityHexes.find((x) => sameHex(x.to!, h));
+      if (a) advance(a);
+      return;
+    }
     if (mode === 'move') {
       const o = passOptions.find((p) => p.receiver && sameHex(p.to, h));
       const a = o && passFor(o);
@@ -252,7 +272,9 @@ export function MatchScreen() {
                 {me.name} <small>({me.role}, {me.core})</small>
               </h3>
               <p className="hint">
-                {mode === 'move'
+                {mode === 'ability'
+                  ? `Click a highlighted hex for ${ability?.name} (${abilityCost} ticks, then the core overheats).`
+                  : mode === 'move'
                   ? `Click a pale blue hex to move (${RULES.cost.move} ticks) or a gold hex to sprint (${RULES.cost.sprint}).${passOptions.some((o) => o.receiver) ? ' Click a pink teammate to pass.' : ''}`
                   : `Click any pink hex to play a ${mode} pass (${RULES.cost.pass} ticks).`}
               </p>
@@ -271,6 +293,46 @@ export function MatchScreen() {
                     >
                       Back to autopilot
                     </button>
+                  )}
+                </div>
+              )}
+              {ability && (abilityActs.length > 0 || isOverheated(me)) && (
+                <div
+                  className={`ability-box ${isOverheated(me) ? 'hot' : ''}`}
+                  style={{ ['--core' as string]: ability.colour }}
+                  aria-label="Signature ability"
+                >
+                  {isOverheated(me) ? (
+                    <p>
+                      <b>{ability.name}</b>: core overheated until tick {me.overheatUntil}. No ability or reactions till then.
+                    </p>
+                  ) : (
+                    <>
+                      <p>
+                        <b>{ability.name}</b> <small>({TIER_NAMES[me.tier]})</small>: {ability.text[me.tier]}.{' '}
+                        {goodMoment && <span className="good">Good moment</span>}
+                      </p>
+                      <p className="hint">
+                        Costs {abilityCost} ticks, then the core overheats for {RULES.overheatTicks} ticks (no ability, no reactions).
+                      </p>
+                      <div className="buttons">
+                        {abilityPlain.map((a) => (
+                          <button key="plain" className="ability-btn" onClick={() => advance(a)}>
+                            {ability.name}
+                          </button>
+                        ))}
+                        {abilityTargets.map((a) => (
+                          <button key={a.target} className="ability-btn" onClick={() => advance(a)}>
+                            {ability.name}: {robotById(state, a.target!).name}
+                          </button>
+                        ))}
+                        {abilityHexes.length > 0 && mode !== 'ability' && (
+                          <button className="ability-btn" onClick={() => setMode('ability')}>
+                            {ability.name}: pick a hex
+                          </button>
+                        )}
+                      </div>
+                    </>
                   )}
                 </div>
               )}
@@ -305,6 +367,7 @@ export function MatchScreen() {
                 {of('shoot').map((a) => (
                   <button key={a.kind} className="shoot" onClick={() => advance(a)}>
                     Shoot: {a.kind}
+                    {me.effect?.kind === 'flame' && ` (Flame +${me.effect.dice})`}
                   </button>
                 ))}
                 {of('tackle').map((a) => (

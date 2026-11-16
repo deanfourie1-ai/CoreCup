@@ -15,6 +15,8 @@ export interface PlayerDef {
   core: string;
   /** Leave out to use the role's starting stats. */
   stats?: PlayerStats;
+  /** Core tier: 1 Spark (default), 2 Surge, 3 Ascended. */
+  tier?: 1 | 2 | 3;
 }
 
 /** Starting stats per role (1 to 5). First draft, to tune in playtests. */

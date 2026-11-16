@@ -61,4 +61,9 @@ export const RULES = {
   /** Extra ticks for a robot that loses the ball to a tackle or Challenge. */
   lostBallDelay: 2,
   overheatTicks: 12,
+
+  /** Signature abilities on or off (the rules simulator compares both). */
+  abilities: true,
+  /** Ticks an ability costs by core tier (Spark, Surge, Ascended), plus Overheat afterwards. */
+  abilityCost: { 1: 8, 2: 7, 3: 6 } as Record<1 | 2 | 3, number>,
 };

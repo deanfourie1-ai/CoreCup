@@ -12,9 +12,13 @@ import {
   type MatchState,
   type PassKind,
 } from '../engine';
+import { autopilotAction } from '../game/autopilot';
 import { describe } from '../game/describe';
+import { diceScenes, type DiceScene } from '../game/dice-scenes';
+import { suggestPasses } from '../game/passes';
 import { isHumanTurn, tryStep, type Answer, type Question } from '../game/session';
 import type { MatchStage } from '../match/stage';
+import { DiceMoment, type DiceSpeed } from './DiceMoment';
 import { MatchStageView } from './MatchStageView';
 import type { Highlight } from './Pitch';
 import { Timeline } from './Timeline';
@@ -22,6 +26,37 @@ import { Timeline } from './Timeline';
 const HUMAN = 'home';
 /** Pause after the pitch settles before the AI acts, so each move can be followed. */
 const AI_DELAY_MS = 350;
+/** Autopilot turns are routine shape moves, so they go quicker than the AI's. */
+const AUTO_DELAY_MS = 160;
+
+interface Settings {
+  dice: DiceSpeed;
+  alwaysReact: boolean;
+  autopilot: boolean;
+}
+
+const DEFAULT_SETTINGS: Settings = { dice: 'dramatic', alwaysReact: false, autopilot: true };
+const SETTINGS_KEY = 'corecup.match.settings';
+
+function loadSettings(): Settings {
+  try {
+    return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}') };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+function Seg<T extends string | boolean>(props: { value: T; options: [T, string][]; onChange: (v: T) => void }) {
+  return (
+    <span className="seg">
+      {props.options.map(([v, label]) => (
+        <button key={String(v)} className={v === props.value ? 'on' : ''} onClick={() => props.onChange(v)}>
+          {label}
+        </button>
+      ))}
+    </span>
+  );
+}
 
 type Mode = 'move' | PassKind;
 
@@ -40,16 +75,35 @@ export function MatchScreen() {
   const [held, setHeld] = useState<Action | undefined>();
   const [question, setQuestion] = useState<Question | null>(null);
   const [mode, setMode] = useState<Mode>('move');
+  const [settings, setSettings] = useState<Settings>(loadSettings);
+  /** Home robots the player has taken off autopilot. */
+  const [manual, setManual] = useState<Set<string>>(() => new Set());
+  /** Dice moments still to play, and the state the pitch keeps showing until they finish. */
+  const [dice, setDice] = useState<{ scenes: DiceScene[]; before: MatchState } | null>(null);
   const stageRef = useRef<MatchStage | null>(null);
 
+  const changeSettings = (patch: Partial<Settings>) => {
+    const next = { ...settings, ...patch };
+    setSettings(next);
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+    } catch {
+      // Private window or blocked storage: the setting still applies for this match.
+    }
+  };
+
   function advance(action?: Action, given: Answer[] = answers) {
-    const res = tryStep(state, HUMAN, ai, given, action);
+    const res = tryStep(state, HUMAN, ai, given, action, { alwaysReact: settings.alwaysReact });
     if (res.question) {
       if (res.question.kind === 'action') return; // our turn: wait for a click
       setHeld(action);
       setAnswers(given);
       setQuestion(res.question);
       return;
+    }
+    if (settings.dice !== 'off') {
+      const scenes = diceScenes(res.state, res.state.log.slice(state.log.length));
+      if (scenes.length) setDice({ scenes, before: state });
     }
     setState(res.state);
     setAnswers([]);
@@ -60,12 +114,30 @@ export function MatchScreen() {
 
   const answer = (a: Answer) => advance(held, [...answers, a]);
 
-  // The AI's turns and ball landings play out on their own, each once the pitch has finished showing the last one.
+  // Robots the autopilot plays this turn (off-ball shape, keeper at home), unless the player took them over.
+  const humanTurn = !dice && !question && isHumanTurn(state, HUMAN);
+  // activeRobot looks at a copy of the state; take the real robot so identity checks hold.
+  const turnRobot = humanTurn ? robotById(state, activeRobot(state)!.id) : undefined;
+  const autoAction =
+    turnRobot && settings.autopilot && !manual.has(turnRobot.id)
+      ? autopilotAction(state, turnRobot, legalActions(state, turnRobot.id))
+      : null;
+
+  // The AI's turns, ball landings and autopilot turns play out on their own, each once the pitch has finished
+  // showing the last one and any dice moment is over.
   useEffect(() => {
-    if (state.over || question || isHumanTurn(state, HUMAN)) return;
+    if (state.over || question || dice) return;
+    if (isHumanTurn(state, HUMAN) && !autoAction) return;
+    // Off-ball turns (autopilot, or an AI robot while someone holds the ball) don't wait for other runs to finish.
+    const next = activeRobot(state);
+    const offBall = !!autoAction || (!!next && state.ball.state === 'held' && state.ball.by !== next.id);
     let t: ReturnType<typeof setTimeout>;
     const wait = () => {
-      t = stageRef.current?.busy() ? setTimeout(wait, 60) : setTimeout(() => advance(), AI_DELAY_MS);
+      const stage = stageRef.current;
+      const blocked = !stage || (offBall ? stage.settling() : stage.busy());
+      t = blocked
+        ? setTimeout(wait, 60)
+        : setTimeout(() => advance(autoAction ?? undefined), offBall ? AUTO_DELAY_MS : AI_DELAY_MS);
     };
     wait();
     return () => clearTimeout(t);
@@ -78,24 +150,46 @@ export function MatchScreen() {
     setAnswers([]);
     setHeld(undefined);
     setQuestion(null);
+    setDice(null);
   }
 
-  const myTurn = !question && isHumanTurn(state, HUMAN);
-  const me = myTurn ? activeRobot(state) : undefined;
+  const me = !autoAction ? turnRobot : undefined;
   const legal = me ? legalActions(state, me.id) : [];
   const of = <T extends Action['type']>(t: T) => legal.filter((a): a is Extract<Action, { type: T }> => a.type === t);
+  const passOptions = me && of('pass').length ? suggestPasses(state, me) : [];
+  const passFor = (o: (typeof passOptions)[number]) =>
+    of('pass').find((a) => a.kind === o.kind && sameHex(a.to, o.to));
+  const wait = of('hold')[0];
+  /** What the pitch shows: the state before the step while its dice moment is playing. */
+  const shown = dice ? dice.before : state;
 
   const highlights: Highlight[] = [];
   if (me && mode === 'move') {
     for (const a of of('move')) highlights.push({ hex: a.to, tone: 'move' });
     for (const a of of('sprint')) highlights.push({ hex: a.to, tone: 'sprint' });
+    // Suggested passes to teammates light up too: one click on a teammate plays it.
+    for (const o of passOptions) if (o.receiver) highlights.push({ hex: o.to, tone: 'target' });
   }
   if (me && mode !== 'move') {
     for (const a of of('pass')) if (a.kind === mode) highlights.push({ hex: a.to, tone: 'target' });
   }
 
+  // One-tap Wait: W key (Space is kept for skipping dice).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code === 'KeyW' && wait && !(e.target instanceof HTMLInputElement)) advance(wait);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
   function onHex(h: Hex) {
     if (!me) return;
+    if (mode === 'move') {
+      const o = passOptions.find((p) => p.receiver && sameHex(p.to, h));
+      const a = o && passFor(o);
+      if (a) return advance(a);
+    }
     const hit = legal.find(
       (a) =>
         ((mode === 'move' && (a.type === 'move' || a.type === 'sprint')) ||
@@ -106,8 +200,8 @@ export function MatchScreen() {
     if (hit) advance(hit);
   }
 
-  const log = state.log
-    .map((e) => describe(state, e))
+  const log = shown.log
+    .map((e) => describe(shown, e))
     .filter((x): x is string => !!x)
     .slice(-12)
     .reverse();
@@ -115,18 +209,27 @@ export function MatchScreen() {
   return (
     <div className="match">
       <header className="scoreboard">
-        <span className="team home">Emberforge {state.score.home}</span>
+        <span className="team home">Emberforge {shown.score.home}</span>
         <span className="clock">
-          {state.half === 1 ? '1st half' : '2nd half'} · tick {state.clock}
+          {shown.half === 1 ? '1st half' : '2nd half'} · tick {shown.clock}
         </span>
-        <span className="team away">{state.score.away} Tidewell</span>
+        <span className="team away">{shown.score.away} Tidewell</span>
       </header>
 
-      <Timeline state={state} active={me?.id} />
+      <Timeline state={shown} active={me?.id} />
 
       <div className="arena">
         <div className="stage-wrap">
-          <MatchStageView state={state} active={me?.id} highlights={highlights} onHex={onHex} stageRef={stageRef} />
+          <MatchStageView state={shown} active={me?.id} highlights={highlights} onHex={onHex} stageRef={stageRef} />
+          {dice && settings.dice !== 'off' && (
+            <DiceMoment
+              key={dice.before.log.length}
+              scenes={dice.scenes}
+              speed={settings.dice}
+              human={HUMAN}
+              onDone={() => setDice(null)}
+            />
+          )}
         </div>
 
         <div className="hud">
@@ -137,15 +240,53 @@ export function MatchScreen() {
               </h3>
               <p className="hint">
                 {mode === 'move'
-                  ? `Click a pale blue hex to move (${RULES.cost.move} ticks) or a gold hex to sprint (${RULES.cost.sprint}).`
-                  : `Click a pink hex to play a ${mode} pass (${RULES.cost.pass} ticks).`}
+                  ? `Click a pale blue hex to move (${RULES.cost.move} ticks) or a gold hex to sprint (${RULES.cost.sprint}).${passOptions.some((o) => o.receiver) ? ' Click a pink teammate to pass.' : ''}`
+                  : `Click any pink hex to play a ${mode} pass (${RULES.cost.pass} ticks).`}
               </p>
+              {wait && (
+                <div className="buttons">
+                  <button className="wait-btn" onClick={() => advance(wait)} title="Shortcut: W">
+                    Wait ({RULES.cost.hold} ticks) · W
+                  </button>
+                  {settings.autopilot && manual.has(me.id) && (
+                    <button
+                      onClick={() => {
+                        const next = new Set(manual);
+                        next.delete(me.id);
+                        setManual(next);
+                      }}
+                    >
+                      Back to autopilot
+                    </button>
+                  )}
+                </div>
+              )}
+              {mode === 'move' && passOptions.length > 0 && (
+                <div className="pass-options" aria-label="Suggested passes">
+                  {passOptions.map((o) => {
+                    const a = passFor(o);
+                    return (
+                      a && (
+                        <button key={`${o.to.col},${o.to.row}`} onClick={() => advance(a)}>
+                          <span>
+                            {o.label} <small>({o.kind})</small>
+                            {o.marked > 0 && <span className="risk"> · marked</span>}
+                          </span>
+                          <span>
+                            {o.need} {o.need === 1 ? 'hit' : 'hits'} · <span className="odds">{Math.round(o.chance * 100)}%</span>
+                          </span>
+                        </button>
+                      )
+                    );
+                  })}
+                </div>
+              )}
               <div className="buttons">
                 {mode !== 'move' && <button onClick={() => setMode('move')}>Back to moving</button>}
-                {of('pass').length > 0 && (
+                {of('pass').length > 0 && mode === 'move' && (
                   <>
-                    <button onClick={() => setMode('ground')}>Ground pass</button>
-                    <button onClick={() => setMode('lofted')}>Lofted pass</button>
+                    <button onClick={() => setMode('ground')}>Any hex: ground</button>
+                    <button onClick={() => setMode('lofted')}>Any hex: lofted</button>
                   </>
                 )}
                 {of('shoot').map((a) => (
@@ -163,15 +304,61 @@ export function MatchScreen() {
                     Intercept ({RULES.cost.intercept})
                   </button>
                 ))}
-                {of('hold').map((a) => (
-                  <button key="h" onClick={() => advance(a)}>
-                    Hold ({RULES.cost.hold})
-                  </button>
-                ))}
               </div>
             </div>
           )}
-          {!me && !state.over && !question && <div className="panel actions hint">Tidewell is playing…</div>}
+          {!me && !state.over && !question && (
+            <div className="panel actions hint">
+              {dice ? 'Rolling…' : autoAction ? `Autopilot: ${turnRobot!.name} keeps the shape…` : 'Tidewell is playing…'}
+            </div>
+          )}
+
+          <div className="panel settings" aria-label="Match settings">
+            <div className="row">
+              <span>Team shape</span>
+              <Seg value={settings.autopilot} options={[[true, 'Autopilot'], [false, 'I move everyone']]} onChange={(v) => changeSettings({ autopilot: v })} />
+            </div>
+            {settings.autopilot && (
+              <div className="squad-chips" title="Click a player to control them yourself every turn">
+                {state.robots
+                  .filter((r) => r.team === HUMAN)
+                  .map((r) => {
+                    const isManual = manual.has(r.id);
+                    return (
+                      <button
+                        key={r.id}
+                        className={isManual ? 'manual' : 'auto'}
+                        onClick={() => {
+                          const next = new Set(manual);
+                          if (isManual) next.delete(r.id);
+                          else next.add(r.id);
+                          setManual(next);
+                        }}
+                      >
+                        {r.name.split(' ')[0]}
+                        {r.role === 'Keeper' ? ' (GK)' : ''}: {isManual ? 'you' : 'auto'}
+                      </button>
+                    );
+                  })}
+              </div>
+            )}
+            <div className="row">
+              <span>Reactions</span>
+              <Seg value={settings.alwaysReact} options={[[false, 'Ask me'], [true, 'Always react']]} onChange={(v) => changeSettings({ alwaysReact: v })} />
+            </div>
+            <div className="row">
+              <span>Dice</span>
+              <Seg
+                value={settings.dice}
+                options={[
+                  ['dramatic', 'Dramatic'],
+                  ['quick', 'Quick'],
+                  ['off', 'Off'],
+                ]}
+                onChange={(v) => changeSettings({ dice: v })}
+              />
+            </div>
+          </div>
 
           <ol className="panel log" aria-label="Match log">
             {log.map((line, i) => (
@@ -207,7 +394,7 @@ export function MatchScreen() {
         </div>
       )}
 
-      {state.over && (
+      {state.over && !dice && (
         <div className="modal">
           <div className="card">
             <p className="big">

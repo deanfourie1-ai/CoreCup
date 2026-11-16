@@ -31,7 +31,12 @@ class NeedsAnswer extends Error {
   }
 }
 
-function humanCoach(answers: Answer[], action?: Action): Controller {
+export interface CoachOptions {
+  /** Answer every reaction prompt with yes, without asking (the "Always react" setting). */
+  alwaysReact?: boolean;
+}
+
+function humanCoach(answers: Answer[], action?: Action, opts: CoachOptions = {}): Controller {
   let next = 0;
   const take = (q: Question) => {
     if (next < answers.length) return answers[next++];
@@ -42,7 +47,8 @@ function humanCoach(answers: Answer[], action?: Action): Controller {
       if (!action) throw new NeedsAnswer({ kind: 'action', robot: r.id });
       return action;
     },
-    chooseReaction: (_s, r, reaction) => take({ kind: 'reaction', robot: r.id, reaction }) as boolean,
+    chooseReaction: (_s, r, reaction) =>
+      opts.alwaysReact ? true : (take({ kind: 'reaction', robot: r.id, reaction }) as boolean),
     chooseCorner: (_s, r, as) => take({ kind: 'corner', robot: r.id, as }) as Corner,
   };
 }
@@ -59,8 +65,9 @@ export function tryStep(
   ai: Controller,
   answers: Answer[],
   action?: Action,
+  opts: CoachOptions = {},
 ): StepResult {
-  const coach = humanCoach(answers, action);
+  const coach = humanCoach(answers, action, opts);
   const controllers = human === 'home' ? { home: coach, away: ai } : { home: ai, away: coach };
   try {
     return { state: step(state, controllers) };

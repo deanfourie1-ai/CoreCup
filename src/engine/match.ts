@@ -30,6 +30,7 @@ import type {
   MatchState,
   PassFlight,
   ReactionKind,
+  RollMod,
   Robot,
   ShotFlight,
   ShotOutcome,
@@ -211,10 +212,43 @@ const actionKey = (a: Action) => JSON.stringify(a);
 // ---------------------------------------------------------------------------
 // Dice and possession
 
-function roll(ctx: Ctx, r: Robot, base: number, purpose: string, mods = 0): number {
-  const penalty = r.role === 'Keeper' && !inOwnGoalArea(r) ? RULES.keeperOutsideAreaPenalty : 0;
-  const result = rollPool(ctx.rng, poolSize(base, mods + penalty));
-  ctx.s.log.push({ t: 'roll', robot: r.id, purpose, dice: result.dice, hits: countHits(result.dice) });
+const STAT_WORDS: Record<keyof Robot['stats'], string> = {
+  speed: 'Speed',
+  power: 'Power',
+  control: 'Control',
+  reflex: 'Reflex',
+};
+
+/**
+ * Rolls a robot's dice pool and logs it with everything the dice moment on screen shows: the stat it came from,
+ * each modifier, and the hits needed when the target is fixed.
+ */
+function roll(
+  ctx: Ctx,
+  r: Robot,
+  stat: keyof Robot['stats'] | { dice: number; label: string },
+  purpose: string,
+  mods: RollMod[] = [],
+  need?: number,
+): number {
+  const base = typeof stat === 'string' ? r.stats[stat] : stat.dice;
+  const baseLabel = typeof stat === 'string' ? STAT_WORDS[stat] : stat.label;
+  const all = [...mods];
+  if (r.role === 'Keeper' && !inOwnGoalArea(r)) all.push({ label: 'Outside goal area', value: RULES.keeperOutsideAreaPenalty });
+  const shown = all.filter((m) => m.value !== 0);
+  const total = shown.reduce((n, m) => n + m.value, 0);
+  const result = rollPool(ctx.rng, poolSize(base, total));
+  ctx.s.log.push({
+    t: 'roll',
+    robot: r.id,
+    purpose,
+    dice: result.dice,
+    hits: countHits(result.dice),
+    base,
+    baseLabel,
+    mods: shown,
+    ...(need !== undefined ? { need } : {}),
+  });
   return result.hits;
 }
 
@@ -275,8 +309,8 @@ function perform(ctx: Ctx, a: Action): void {
     case 'tackle': {
       r.tick += RULES.cost.tackle;
       const target = robotById(s, a.target);
-      const won = roll(ctx, r, r.stats.power, 'tackle');
-      const kept = roll(ctx, target, target.stats.control, 'keep ball');
+      const won = roll(ctx, r, 'power', 'tackle');
+      const kept = roll(ctx, target, 'control', 'keep ball');
       if (won > kept) {
         setHeld(ctx, r);
         target.tick += RULES.lostBallDelay;
@@ -311,8 +345,8 @@ function walk(ctx: Ctx, r: Robot, path: Hex[]): void {
     for (const o of challengers) {
       offered.add(o.id);
       if (!offerReaction(ctx, o, 'challenge')) continue;
-      const take = roll(ctx, o, o.stats.power, 'challenge');
-      const keep = roll(ctx, r, r.stats.control, 'keep ball');
+      const take = roll(ctx, o, 'power', 'challenge');
+      const keep = roll(ctx, r, 'control', 'keep ball');
       if (take > keep) {
         r.tick += RULES.lostBallDelay;
         return setHeld(ctx, o);
@@ -324,8 +358,9 @@ function walk(ctx: Ctx, r: Robot, path: Hex[]): void {
 
 function kickPass(ctx: Ctx, r: Robot, target: Hex, kind: PassFlight['kind']): void {
   const { s } = ctx;
-  const hits = roll(ctx, r, r.stats.control, 'pass');
-  const missing = Math.max(0, RULES.passBand(distance(r.pos, target)) - hits);
+  const band = RULES.passBand(distance(r.pos, target));
+  const hits = roll(ctx, r, 'control', 'pass', [], band);
+  const missing = Math.max(0, band - hits);
   const to = scatter(ctx, target, missing, r.team);
   const flightDistance = distance(r.pos, to);
   const flight: PassFlight = {
@@ -353,7 +388,7 @@ function kickPass(ctx: Ctx, r: Robot, target: Hex, kind: PassFlight['kind']): vo
 }
 
 function interceptRoll(ctx: Ctx, r: Robot, f: PassFlight): 'steal' | 'deflect' | 'miss' {
-  const hits = roll(ctx, r, r.stats.reflex, 'intercept');
+  const hits = roll(ctx, r, 'reflex', 'intercept', [], f.kickerHits + 1);
   if (hits > f.kickerHits) {
     setHeld(ctx, r);
     return 'steal';
@@ -368,11 +403,23 @@ function interceptRoll(ctx: Ctx, r: Robot, f: PassFlight): 'steal' | 'deflect' |
 function kickShot(ctx: Ctx, r: Robot, kind: ShotFlight['kind']): void {
   const { s } = ctx;
   const d = distance(r.pos, targetGoal(r.team));
-  const dice =
-    r.stats.power - Math.floor(d / RULES.shot.distancePenaltyPer) + (kind === 'placed' ? RULES.shot.placedBonus : 0);
+  const diceMods: RollMod[] = [
+    { label: 'Distance', value: -Math.floor(d / RULES.shot.distancePenaltyPer) },
+    { label: 'Placed shot', value: kind === 'placed' ? RULES.shot.placedBonus : 0 },
+  ].filter((m) => m.value !== 0);
+  const dice = r.stats.power + diceMods.reduce((n, m) => n + m.value, 0);
   s.ball = {
     state: 'flight',
-    flight: { type: 'shot', kind, team: r.team, kicker: r.id, from: r.pos, dice, landTick: s.clock + RULES.flight[kind] },
+    flight: {
+      type: 'shot',
+      kind,
+      team: r.team,
+      kicker: r.id,
+      from: r.pos,
+      dice,
+      diceMods,
+      landTick: s.clock + RULES.flight[kind],
+    },
   };
 }
 
@@ -397,8 +444,8 @@ function landPass(ctx: Ctx, f: PassFlight): void {
   if (!mine.length) return setHeld(ctx, theirs[0]);
   const receiver = mine[0];
   const challenger = theirs[0];
-  const rec = roll(ctx, receiver, receiver.stats.control, 'receive');
-  const ch = roll(ctx, challenger, challenger.stats.power, 'contest');
+  const rec = roll(ctx, receiver, 'control', 'receive');
+  const ch = roll(ctx, challenger, 'power', 'contest');
   if (rec > ch) setHeld(ctx, receiver);
   else if (ch > rec) setHeld(ctx, challenger);
   else setLoose(ctx, scatter(ctx, f.to, 1, f.team));
@@ -440,18 +487,24 @@ function shotMoment(ctx: Ctx, f: ShotFlight): void {
   let blockHits = 0;
   const blockHitsBy = new Map<string, number>();
   for (const b of blockers) {
-    const h = roll(ctx, b, b.stats.reflex, 'block');
+    const h = roll(ctx, b, 'reflex', 'block');
     blockHits += h;
     blockHitsBy.set(b.id, h);
   }
   const chipBonus = f.kind === 'chip' && !keeperIn ? RULES.shot.chipBonusKeeperOut : 0;
-  const shotHits = roll(ctx, shooter, f.dice, 'shot', chipBonus);
+  const shotMods: RollMod[] = f.diceMods
+    ? [...f.diceMods]
+    : [{ label: 'Shot', value: f.dice - shooter.stats.power }];
+  if (chipBonus) shotMods.push({ label: 'Chip, keeper off the line', value: chipBonus });
+  const shotHits = roll(ctx, shooter, 'power', 'shot', shotMods);
   let keeperHits = 0;
   if (dive) {
     const guess = keeperCorner === corner ? RULES.shot.cornerGuessRight : RULES.shot.cornerGuessWrong;
-    keeperHits = roll(ctx, keeper!, keeper!.stats.reflex, 'dive', guess);
+    keeperHits = roll(ctx, keeper!, 'reflex', 'dive', [
+      { label: keeperCorner === corner ? 'Guessed the corner' : 'Wrong corner', value: guess },
+    ]);
   } else if (keeperIn) {
-    keeperHits = roll(ctx, keeper!, RULES.shot.keeperPositioningDice, 'positioning');
+    keeperHits = roll(ctx, keeper!, { dice: RULES.shot.keeperPositioningDice, label: 'Positioning' }, 'positioning');
   }
 
   const margin = shotHits - (blockHits + keeperHits);

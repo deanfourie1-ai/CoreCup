@@ -394,6 +394,17 @@ export class MatchStage {
     this.bannerTimer = seconds;
   }
 
+  /**
+   * Like `busy`, but ignores players still running. Off-ball shape moves use it, so a team shifts together instead
+   * of one robot at a time.
+   */
+  settling(): boolean {
+    if (!this.state || !this.actors.size) return true;
+    if (this.settleTimer > 0 || this.ballScript) return true;
+    const target = this.ballTarget(this.state);
+    return this.ballWorld.distanceTo(target.pos) > 0.08;
+  }
+
   /** True while anything on the pitch is still playing out (runs, the ball travelling, a shot's finish). */
   busy(): boolean {
     if (!this.state || !this.actors.size) return true;

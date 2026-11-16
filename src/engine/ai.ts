@@ -17,7 +17,7 @@ import type { Action, Controller, Corner, MatchState, Robot } from './types';
 
 const CORNERS: Corner[] = ['left', 'centre', 'right'];
 
-function towards(r: Robot, legal: Action[], target: Hex): Action {
+export function towards(r: Robot, legal: Action[], target: Hex): Action {
   const now = distance(r.pos, target);
   let best: Action | undefined;
   let bestDist = now;
@@ -73,7 +73,7 @@ function withCarrier(s: MatchState, r: Robot, legal: Action[]): Action {
   return shoot.find((a) => a.kind === 'driven')!;
 }
 
-function keeperPlay(s: MatchState, r: Robot, legal: Action[]): Action {
+export function keeperPlay(s: MatchState, r: Robot, legal: Action[]): Action {
   const tackle = find(legal, 'tackle')[0];
   if (tackle) return tackle;
   const ball = s.ball;

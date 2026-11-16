@@ -4,6 +4,7 @@
 // for a loose ball or a pass, and any robot the player has taken over.
 
 import {
+  abilityChoice,
   ballHolder,
   clampCol,
   distance,
@@ -32,6 +33,8 @@ export function ballSpot(s: MatchState): Hex {
 export function needsPlayer(s: MatchState, r: Robot, legal: Action[]): boolean {
   if (ballHolder(s)?.id === r.id) return true;
   if (legal.some((a) => a.type === 'tackle' || a.type === 'intercept')) return true;
+  // A good moment for the robot's signature ability (Stone Wall, Guardian Aura...): the player decides, not the autopilot.
+  if (abilityChoice(s, r, legal)) return true;
   if (r.role === 'Keeper') return false;
   const racing = s.ball.state === 'loose' || (s.ball.state === 'flight' && s.ball.flight.type === 'pass');
   return racing && distance(r.pos, ballSpot(s)) <= r.stats.speed + 3;
@@ -94,12 +97,12 @@ export function shapeSpot(s: MatchState, r: Robot): Hex {
 export function autopilotAction(s: MatchState, r: Robot, legal: Action[]): Action | null {
   if (needsPlayer(s, r, legal)) return null;
   const wait = legal.find((a) => a.type === 'hold')!;
-  if (r.role === 'Keeper') return keeperPlay(s, r, legal);
+  if (r.role === 'Keeper') return keeperPlay(s, r, legal.filter((a) => a.type !== 'ability'));
   const target = shapeSpot(s, r);
   if (distance(r.pos, target) <= 1) return wait;
   return towards(
     r,
-    legal.filter((a) => a.type !== 'sprint'),
+    legal.filter((a) => a.type !== 'sprint' && a.type !== 'ability'),
     target,
   );
 }

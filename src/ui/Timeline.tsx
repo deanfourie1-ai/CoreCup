@@ -1,4 +1,4 @@
-import { RULES, type MatchState } from '../engine';
+import { isOverheated, RULES, type MatchState } from '../engine';
 
 /** The shared track: every robot's token and, when it's flying, the ball. */
 export function Timeline({ state, active }: { state: MatchState; active?: string }) {
@@ -24,12 +24,23 @@ export function Timeline({ state, active }: { state: MatchState; active?: string
           .map((r) => (
             <div
               key={r.id}
-              className={`token ${r.team} ${r.id === active ? 'active' : ''}`}
+              className={`token ${r.team} ${r.id === active ? 'active' : ''} ${isOverheated(r) ? 'hot' : ''}`}
               style={{ left: pct(r.tick), top: 5 + lane(r.tick) * 14 }}
-              title={`${r.name}: tick ${r.tick}`}
+              title={`${r.name}: tick ${r.tick}${isOverheated(r) ? ` · core overheated until tick ${r.overheatUntil}` : ''}`}
             >
               {r.name.split(' ')[0]}
             </div>
+          ))}
+        {/* Overheat markers: where each overheated core cools down (by hand, the marker 12 ticks ahead of the token). */}
+        {state.robots
+          .filter((r) => isOverheated(r))
+          .map((r) => (
+            <div
+              key={`oh-${r.id}`}
+              className={`overheat-mark ${r.team}`}
+              style={{ left: pct(r.overheatUntil!) }}
+              title={`${r.name}'s core cools at tick ${r.overheatUntil}`}
+            />
           ))}
         {flight && (
           <div className="token ball-token" style={{ left: pct(flight.landTick), top: 5 + lane(flight.landTick) * 14 }}>

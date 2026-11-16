@@ -30,6 +30,8 @@ export function describe(s: MatchState, e: MatchEvent): string | null {
           return `${who} steps in to intercept.`;
         case 'hold':
           return `${who} holds.`;
+        case 'ability':
+          return null; // The ability event below says it.
       }
       return null;
     }
@@ -48,6 +50,14 @@ export function describe(s: MatchState, e: MatchEvent): string | null {
       }[e.outcome];
     case 'goal':
       return `Score: ${e.score.home} to ${e.score.away}.`;
+    case 'ability':
+      return `${name(e.robot)} uses ${e.name}!`;
+    case 'decoy':
+      return `${name(e.robot)} goes for the decoy. Fooled by Fox Mirage!`;
+    case 'walled':
+      return `${name(e.by)}'s wall stops the ${e.what}!`;
+    case 'shoved':
+      return `${name(e.robot)} is ${robotById(s, e.by).core === 'Kelpie' ? 'pulled by the Undertow' : 'knocked aside'}.`;
     case 'coin':
       return `Coin toss: ${e.winner === 'home' ? 'Emberforge' : 'Tidewell'} win it and kick off.`;
     case 'halftime':

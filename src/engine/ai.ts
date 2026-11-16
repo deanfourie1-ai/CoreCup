@@ -2,6 +2,7 @@
 // opponent and lets whole matches run headless for tests and the simulator.
 // It does not look ahead; a smarter AI comes in a later build step.
 
+import { abilityChoice } from './ability-ai';
 import { clampCol, distance, type Hex } from './hex';
 import {
   ballHolder,
@@ -10,6 +11,7 @@ import {
   ownGoal,
   passRange,
   robotAt,
+  shotWallHex,
   targetGoal,
 } from './match';
 import { createRng } from './rng';
@@ -49,7 +51,9 @@ function withCarrier(s: MatchState, r: Robot, legal: Action[]): Action {
   const goal = targetGoal(r.team);
   const d = distance(r.pos, goal);
   const shoot = find(legal, 'shoot');
-  if (d <= 5) return shoot.find((a) => a.kind === (d <= 3 ? 'placed' : 'driven'))!;
+  // A wall on the line: chip over it.
+  const walled = !!shotWallHex(s, r.team, r.pos, 'driven');
+  if (d <= 5 || r.effect?.kind === 'flame') return shoot.find((a) => a.kind === (walled ? 'chip' : d <= 3 ? 'placed' : 'driven'))!;
 
   const pressed = s.robots.some((o) => o.team !== r.team && distance(o.pos, r.pos) === 1);
   const options = s.robots
@@ -70,7 +74,7 @@ function withCarrier(s: MatchState, r: Robot, legal: Action[]): Action {
   const move = towards(r, legal, goal);
   if (move.type !== 'hold') return move;
   if (options.length) return passTo(options[0]);
-  return shoot.find((a) => a.kind === 'driven')!;
+  return shoot.find((a) => a.kind === (walled ? 'chip' : 'driven'))!;
 }
 
 export function keeperPlay(s: MatchState, r: Robot, legal: Action[]): Action {
@@ -84,10 +88,14 @@ export function keeperPlay(s: MatchState, r: Robot, legal: Action[]): Action {
   return legal.find((a) => a.type === 'hold')!;
 }
 
-export function createSimpleAI(seed: number): Controller {
+export function createSimpleAI(seed: number, opts: { abilities?: boolean } = {}): Controller {
   const rng = createRng(seed ^ 0x5eed);
+  const useAbilities = opts.abilities ?? true;
   return {
     chooseAction(s, r, legal) {
+      const ability = useAbilities ? abilityChoice(s, r, legal) : null;
+      if (ability) return ability;
+      legal = legal.filter((a) => a.type !== 'ability');
       if (r.role === 'Keeper' && ballHolder(s) !== r) return keeperPlay(s, r, legal);
       const holder = ballHolder(s);
       if (holder === r) return withCarrier(s, r, legal);

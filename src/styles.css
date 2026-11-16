@@ -116,6 +116,21 @@ body {
   font-weight: 700;
 }
 
+/* An overheated core: no ability and no reactions until it cools. */
+.token.hot {
+  box-shadow: 0 0 0 2px #ff6a3d, 0 0 8px #ff6a3d;
+}
+
+.overheat-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(#ff6a3d 0 4px, transparent 4px 7px);
+  opacity: 0.85;
+}
+
 .scale {
   margin: 0 28px;
   display: flex;
@@ -1042,6 +1057,43 @@ button.shoot {
   background: #ffd36b;
   color: #20102c;
   border: none;
+}
+
+/* ---------------------------------------------------------------- signature abilities */
+
+.ability-box {
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--core) 60%, transparent);
+  background: color-mix(in srgb, var(--core) 12%, transparent);
+}
+
+.ability-box .ability-btn {
+  font-weight: 800;
+  background: var(--core);
+  color: #20102c;
+  border: none;
+}
+
+.ability-box p {
+  margin: 4px 0;
+  font-size: 0.82rem;
+}
+
+.ability-box .good {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: var(--core);
+  color: #20102c;
+}
+
+.ability-box.hot {
+  --core: #ff6a3d;
+  opacity: 0.85;
 }
 
 .pass-options {

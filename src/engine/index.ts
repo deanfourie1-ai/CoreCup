@@ -29,5 +29,10 @@ export {
   reachable,
   otherTeam,
   attacksEast,
+  wallAt,
+  shotWallHex,
+  decoyHexes,
 } from './match';
+export { ABILITIES, TIER_NAMES, abilityOf, abilityN, type AbilityDef, type CoreTier } from './abilities';
+export { abilityChoice } from './ability-ai';
 export { createSimpleAI, towards, keeperPlay } from './ai';

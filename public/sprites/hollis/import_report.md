@@ -1,0 +1,72 @@
+# Sprite delivery import report
+
+## Errors (0)
+- none
+
+## Warnings (59)
+- cc_hollis_idle_e_[00].png: character is 337 px tall above the foot line, expected about 300
+- cc_hollis_idle_e_[00, 01, 02, 03].png: pale edge halo
+- cc_hollis_idle_e_[00, 01, 02, 03].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_idle_e_[02].png: character is 331 px tall above the foot line, expected about 300
+- cc_hollis_idle_e_[03].png: character is 339 px tall above the foot line, expected about 300
+- cc_hollis_idle_se_[00, 01, 02, 03].png: character is 337 px tall above the foot line, expected about 300
+- cc_hollis_idle_se_[00, 01, 02, 03].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_idle_sw_[00, 01, 02, 03].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_idle_sw_[01].png: character is 333 px tall above the foot line, expected about 300
+- cc_hollis_idle_w_[00].png: character is 334 px tall above the foot line, expected about 300
+- cc_hollis_idle_w_[00, 01, 02, 03].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_idle_w_[01].png: character is 337 px tall above the foot line, expected about 300
+- cc_hollis_idle_nw_[00, 01, 02].png: soles at y=400, expected 394
+- cc_hollis_idle_nw_[00, 01, 02, 03].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_idle_nw_[01].png: character is 332 px tall above the foot line, expected about 300
+- cc_hollis_idle_nw_[03].png: soles at y=399, expected 394
+- cc_hollis_idle_ne_[00, 01].png: soles at y=400, expected 394
+- cc_hollis_idle_ne_[00, 01, 02, 03].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_idle_ne_[02, 03].png: soles at y=401, expected 394
+- cc_hollis_run_e_[00].png: character is 331 px tall above the foot line, expected about 300
+- cc_hollis_run_e_[00, 01, 02, 03, 04, 05, 06, 07].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_run_e_[01].png: character is 332 px tall above the foot line, expected about 300
+- cc_hollis_run_e_[02].png: character is 341 px tall above the foot line, expected about 300
+- cc_hollis_run_e_[03].png: character is 344 px tall above the foot line, expected about 300
+- cc_hollis_run_e_[04].png: character is 339 px tall above the foot line, expected about 300
+- cc_hollis_run_e_[05].png: character is 338 px tall above the foot line, expected about 300
+- cc_hollis_run_e_[06].png: character is 350 px tall above the foot line, expected about 300
+- cc_hollis_run_e_[07].png: character is 337 px tall above the foot line, expected about 300
+- cc_hollis_run_se_[00].png: character is 336 px tall above the foot line, expected about 300
+- cc_hollis_run_se_[00, 01, 02, 03, 04, 05, 06, 07].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_run_se_[01, 07].png: character is 333 px tall above the foot line, expected about 300
+- cc_hollis_run_se_[04].png: character is 335 px tall above the foot line, expected about 300
+- cc_hollis_run_se_[05].png: character is 332 px tall above the foot line, expected about 300
+- cc_hollis_run_se_[06].png: character is 334 px tall above the foot line, expected about 300
+- run_sw: 6 frames, spec asks for 8
+- cc_hollis_run_sw_[00].png: character is 332 px tall above the foot line, expected about 300
+- cc_hollis_run_sw_[00, 01, 02, 03, 04, 05].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_run_w_[00].png: character is 338 px tall above the foot line, expected about 300
+- cc_hollis_run_w_[00, 01, 02, 03, 04, 05, 06, 07].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_run_w_[01].png: character is 336 px tall above the foot line, expected about 300
+- cc_hollis_run_w_[02, 07].png: character is 344 px tall above the foot line, expected about 300
+- cc_hollis_run_w_[03].png: character is 337 px tall above the foot line, expected about 300
+- cc_hollis_run_w_[04].png: character is 346 px tall above the foot line, expected about 300
+- cc_hollis_run_w_[05].png: character is 341 px tall above the foot line, expected about 300
+- cc_hollis_run_w_[06].png: character is 353 px tall above the foot line, expected about 300
+- run_nw: 6 frames, spec asks for 8
+- cc_hollis_run_nw_[00].png: character is 332 px tall above the foot line, expected about 300
+- cc_hollis_run_nw_[00, 01, 02, 03, 04, 05].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_run_nw_[02, 05].png: character is 331 px tall above the foot line, expected about 300
+- cc_hollis_run_nw_[03].png: character is 334 px tall above the foot line, expected about 300
+- cc_hollis_run_ne_[00, 01, 02, 03, 04, 05, 06, 07].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- keeper: facing e missing (the game will mirror the opposite facing)
+- cc_hollis_keeper_se_[00, 01, 02, 03].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
+- cc_hollis_keeper_se_[01].png: character is 334 px tall above the foot line, expected about 300
+- cc_hollis_keeper_se_[02].png: character is 331 px tall above the foot line, expected about 300
+- keeper: facing sw missing (the game will mirror the opposite facing)
+- keeper: facing w missing (the game will mirror the opposite facing)
+- keeper: facing nw missing (the game will mirror the opposite facing)
+- keeper: facing ne missing (the game will mirror the opposite facing)
+
+## Notes (5)
+- shot: not delivered yet
+- ability: not delivered yet
+- run_to_shot: not delivered yet
+- run_to_idle: not delivered yet
+- packed 72 frames and 0 rigid gear pieces onto 2 atlas page(s)

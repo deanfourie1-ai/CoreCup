@@ -59,6 +59,8 @@ ACTIONS = {
     "ability": ("ability", 10, 12, False),
     "run_to_shot": ("run_to_shot", 2, 12, False),
     "run_to_idle": ("run_to_idle", 2, 12, False),
+    # Keepers only: the ready stance in front of goal (front-facing, delivered as the se view).
+    "keeper": ("keeper_ready", 4, 6, True),
 }
 
 # Where each rigid slot attaches by default: (anchor, align-to anchor), with {s} = side.

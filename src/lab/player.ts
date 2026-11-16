@@ -28,6 +28,8 @@ export class SpritePlayer {
   action: ActionName = 'loco_idle';
   loadout: Loadout;
   showAnchors = false;
+  /** Ground speed while running, in world units per second (the run cycle keeps pace with it). */
+  speed = RUN_SPEED;
   /** Called on animation events (foot contact, ball release). */
   onEvent?: (e: SpriteEvent, p: SpritePlayer) => void;
   /** Called when a non-looping action finishes. */
@@ -165,7 +167,7 @@ export class SpritePlayer {
       const d = target.clone().sub(this.pos);
       const dist = Math.hypot(d.x, d.z);
       if (dist > 0.02) this.dir = directionFromVector(d.x, d.z);
-      const stepLen = RUN_SPEED * dt;
+      const stepLen = this.speed * dt;
       if (dist <= stepLen) {
         this.pos.copy(target);
         this.hex = this.path.shift()!;
@@ -182,7 +184,7 @@ export class SpritePlayer {
     const view = resolveFrame(this.sheet.def, this.action, this.dir, 0).view;
     const steps = action.views[view]!.length;
     const stride = action.stride_px_by_view?.[view] ?? action.stride_px;
-    const fps = stride && this.moving ? (steps * RUN_SPEED) / (stride * this.k) : action.fps;
+    const fps = stride && this.moving ? (steps * this.speed) / (stride * this.k) : action.fps;
     const frameDur = 1 / fps;
     while (this.frameClock >= frameDur && !this.finished) {
       this.frameClock -= frameDur;

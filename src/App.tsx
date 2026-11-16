@@ -10,12 +10,12 @@ export function App() {
   if (screen === 'menu') return <MainMenu onKickOff={() => setScreen('match')} />;
 
   return (
-    <main className="page">
+    <main className="page match-page">
       <div className="match-bar">
         <button onClick={() => setScreen('menu')}>◂ Main menu</button>
         <h1 className="title">Core Cup</h1>
+        <p className="subtitle">You coach Emberforge Foundry against the Tidewell Mariners AI.</p>
       </div>
-      <p className="subtitle">Placeholder board. You coach Emberforge Foundry against the Tidewell Mariners AI.</p>
       <MatchScreen />
     </main>
   );

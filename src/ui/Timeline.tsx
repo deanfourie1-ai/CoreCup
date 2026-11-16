@@ -16,7 +16,7 @@ export function Timeline({ state, active }: { state: MatchState; active?: string
   const tallest = Math.max(...[...new Set(ticks)].map((t) => ticks.filter((x) => x === t).length));
   return (
     <div className="timeline" aria-label="Timeline">
-      <div className="track" style={{ height: 12 + tallest * 18 }}>
+      <div className="track" style={{ height: 10 + tallest * 14 }}>
         <div className="now" style={{ left: pct(state.clock) }} />
         <div className="half" style={{ left: pct(RULES.halfLength) }} />
         {[...state.robots]
@@ -25,14 +25,14 @@ export function Timeline({ state, active }: { state: MatchState; active?: string
             <div
               key={r.id}
               className={`token ${r.team} ${r.id === active ? 'active' : ''}`}
-              style={{ left: pct(r.tick), top: 6 + lane(r.tick) * 18 }}
+              style={{ left: pct(r.tick), top: 5 + lane(r.tick) * 14 }}
               title={`${r.name}: tick ${r.tick}`}
             >
               {r.name.split(' ')[0]}
             </div>
           ))}
         {flight && (
-          <div className="token ball-token" style={{ left: pct(flight.landTick), top: 6 + lane(flight.landTick) * 18 }}>
+          <div className="token ball-token" style={{ left: pct(flight.landTick), top: 5 + lane(flight.landTick) * 14 }}>
             Ball
           </div>
         )}

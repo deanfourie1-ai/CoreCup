@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   activeRobot,
   createMatch,
@@ -14,11 +14,14 @@ import {
 } from '../engine';
 import { describe } from '../game/describe';
 import { isHumanTurn, tryStep, type Answer, type Question } from '../game/session';
-import { Pitch, type Highlight } from './Pitch';
+import type { MatchStage } from '../match/stage';
+import { MatchStageView } from './MatchStageView';
+import type { Highlight } from './Pitch';
 import { Timeline } from './Timeline';
 
 const HUMAN = 'home';
-const AI_DELAY_MS = 450;
+/** Pause after the pitch settles before the AI acts, so each move can be followed. */
+const AI_DELAY_MS = 350;
 
 type Mode = 'move' | PassKind;
 
@@ -37,6 +40,7 @@ export function MatchScreen() {
   const [held, setHeld] = useState<Action | undefined>();
   const [question, setQuestion] = useState<Question | null>(null);
   const [mode, setMode] = useState<Mode>('move');
+  const stageRef = useRef<MatchStage | null>(null);
 
   function advance(action?: Action, given: Answer[] = answers) {
     const res = tryStep(state, HUMAN, ai, given, action);
@@ -56,10 +60,14 @@ export function MatchScreen() {
 
   const answer = (a: Answer) => advance(held, [...answers, a]);
 
-  // The AI's turns and ball landings play out on their own.
+  // The AI's turns and ball landings play out on their own, each once the pitch has finished showing the last one.
   useEffect(() => {
     if (state.over || question || isHumanTurn(state, HUMAN)) return;
-    const t = setTimeout(() => advance(), AI_DELAY_MS);
+    let t: ReturnType<typeof setTimeout>;
+    const wait = () => {
+      t = stageRef.current?.busy() ? setTimeout(wait, 60) : setTimeout(() => advance(), AI_DELAY_MS);
+    };
+    wait();
     return () => clearTimeout(t);
   });
 
@@ -101,7 +109,7 @@ export function MatchScreen() {
   const log = state.log
     .map((e) => describe(state, e))
     .filter((x): x is string => !!x)
-    .slice(-14)
+    .slice(-12)
     .reverse();
 
   return (
@@ -116,19 +124,21 @@ export function MatchScreen() {
 
       <Timeline state={state} active={me?.id} />
 
-      <div className="board">
-        <Pitch state={state} active={me?.id} highlights={highlights} onHex={onHex} />
+      <div className="arena">
+        <div className="stage-wrap">
+          <MatchStageView state={state} active={me?.id} highlights={highlights} onHex={onHex} stageRef={stageRef} />
+        </div>
 
-        <aside className="side">
+        <div className="hud">
           {me && (
-            <div className="panel">
+            <div className="panel actions">
               <h3>
                 {me.name} <small>({me.role}, {me.core})</small>
               </h3>
               <p className="hint">
                 {mode === 'move'
-                  ? `Click a green hex to move (${RULES.cost.move} ticks) or a gold hex to sprint (${RULES.cost.sprint}).`
-                  : `Click a hex to play a ${mode} pass (${RULES.cost.pass} ticks).`}
+                  ? `Click a pale blue hex to move (${RULES.cost.move} ticks) or a gold hex to sprint (${RULES.cost.sprint}).`
+                  : `Click a pink hex to play a ${mode} pass (${RULES.cost.pass} ticks).`}
               </p>
               <div className="buttons">
                 {mode !== 'move' && <button onClick={() => setMode('move')}>Back to moving</button>}
@@ -161,14 +171,14 @@ export function MatchScreen() {
               </div>
             </div>
           )}
-          {!me && !state.over && !question && <div className="panel hint">Tidewell is playing…</div>}
+          {!me && !state.over && !question && <div className="panel actions hint">Tidewell is playing…</div>}
 
-          <ol className="log">
+          <ol className="panel log" aria-label="Match log">
             {log.map((line, i) => (
               <li key={state.log.length - i}>{line}</li>
             ))}
           </ol>
-        </aside>
+        </div>
       </div>
 
       {question && question.kind === 'reaction' && (

@@ -9,7 +9,7 @@
 - cc_lan_idle_sw_[00, 01, 02, 03].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
 - cc_lan_idle_w_[00, 01, 02, 03].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
 - idle: facing nw missing (the game will mirror the opposite facing)
-- idle: facing ne missing (the game will mirror the opposite facing)
+- cc_lan_idle_ne_[00, 01, 02, 03].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
 - cc_lan_run_e_[00, 01, 02, 03, 04, 05, 06, 07].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
 - cc_lan_run_se_[00].png: character is 267 px tall above the foot line, expected about 300
 - cc_lan_run_se_[00, 01, 02, 03, 04, 05, 06, 07].png: anchors missing: head_top, brow, shoulder_L, shoulder_R, forearm_L, forearm_R, hand_L, hand_R, chest_core, back, shin_L, shin_R, heel_L, heel_R, toe_L, toe_R
@@ -43,4 +43,4 @@
 - run_to_shot: not delivered yet
 - run_to_idle: not delivered yet
 - keeper: not delivered yet
-- packed 48 frames and 0 rigid gear pieces onto 1 atlas page(s)
+- packed 52 frames and 0 rigid gear pieces onto 1 atlas page(s)

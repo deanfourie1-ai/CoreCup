@@ -72,6 +72,7 @@ describe('team-shape autopilot', () => {
 
   it('always hands over a tackle chance', () => {
     const s = createMatch({ seed: 2 });
+    s.kickoff = null;
     const carrier = robotById(s, (s.ball as { by: string }).by);
     const away = s.robots.find((r) => r.team === 'away' && r.role === 'Midfielder')!;
     away.pos = { col: carrier.pos.col + 1, row: carrier.pos.row };
@@ -111,6 +112,7 @@ describe('always react', () => {
     carrier.pos = { col: 8, row: 4 };
     carrier.tick = 0;
     s.ball = { state: 'held', by: 'away-4' };
+    s.kickoff = null;
     const defender = robotById(s, 'home-1');
     defender.pos = { col: 6, row: 3 };
     defender.tick = 1;

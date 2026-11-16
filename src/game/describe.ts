@@ -48,6 +48,8 @@ export function describe(s: MatchState, e: MatchEvent): string | null {
       }[e.outcome];
     case 'goal':
       return `Score: ${e.score.home} to ${e.score.away}.`;
+    case 'coin':
+      return `Coin toss: ${e.winner === 'home' ? 'Emberforge' : 'Tidewell'} win it and kick off.`;
     case 'halftime':
       return 'Half time.';
     case 'fulltime':

@@ -109,6 +109,7 @@ export type MatchEvent =
       keeperCorner: Corner | null;
     }
   | { t: 'goal'; team: TeamId; score: Score }
+  | { t: 'coin'; winner: TeamId }
   | { t: 'halftime' }
   | { t: 'fulltime'; score: Score };
 
@@ -129,6 +130,11 @@ export interface MatchState {
   /** Wins the next timeline tie that comes down to teams; flips when used. */
   tieFlip: TeamId;
   firstKickoff: TeamId;
+  /**
+   * Kick-off protection: set by every kick-off reset. The taker acts first whatever the track says; until it has
+   * moved, passed or shot, opponents stay in their own half and at least 2 hexes from the ball.
+   */
+  kickoff?: { taker: string; acted: boolean } | null;
   log: MatchEvent[];
 }
 

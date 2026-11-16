@@ -7,8 +7,10 @@ export interface MatchOptions {
   seed: number;
   home?: ClubDef;
   away?: ClubDef;
-  /** Which team kicks off the first half. Defaults to home. */
+  /** Which team kicks off the first half (the coin toss winner). Defaults to home. */
   kickoff?: TeamId;
+  /** Log the coin toss that decided `kickoff`. */
+  coinToss?: boolean;
 }
 
 export const CENTRE: Hex = { col: 6, row: 4 };
@@ -44,6 +46,7 @@ export function resetForKickoff(state: MatchState, kickoff: TeamId): void {
   }
   const striker = state.robots.find((r) => r.team === kickoff && r.role === 'Striker');
   state.ball = { state: 'held', by: striker!.id };
+  state.kickoff = { taker: striker!.id, acted: false };
 }
 
 function buildTeam(club: ClubDef, team: TeamId): Robot[] {
@@ -75,7 +78,7 @@ export function createMatch(options: MatchOptions): MatchState {
     ball: { state: 'loose', at: CENTRE },
     tieFlip: kickoff === 'home' ? 'away' : 'home',
     firstKickoff: kickoff,
-    log: [],
+    log: options.coinToss ? [{ t: 'coin', winner: kickoff }] : [],
   };
   resetForKickoff(state, kickoff);
   return state;

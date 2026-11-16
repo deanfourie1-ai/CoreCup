@@ -59,6 +59,7 @@ function Seg<T extends string | boolean>(props: { value: T; options: [T, string]
 }
 
 type Mode = 'move' | PassKind;
+type Coin = 'heads' | 'tails';
 
 const REACTION_WORDS = {
   intercept: 'intercept the pass',
@@ -71,6 +72,9 @@ export function MatchScreen() {
   const [seed, setSeed] = useState(() => Date.now() % 1_000_000);
   const ai = useMemo(() => createSimpleAI(seed), [seed]);
   const [state, setState] = useState<MatchState>(() => createMatch({ seed }));
+  /** The coin toss before kick-off: null until called, then what the coin showed and who won. */
+  const [toss, setToss] = useState<{ call: Coin; landed: Coin; won: boolean } | null>(null);
+  const [tossDone, setTossDone] = useState(false);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [held, setHeld] = useState<Action | undefined>();
   const [question, setQuestion] = useState<Question | null>(null);
@@ -115,7 +119,7 @@ export function MatchScreen() {
   const answer = (a: Answer) => advance(held, [...answers, a]);
 
   // Robots the autopilot plays this turn (off-ball shape, keeper at home), unless the player took them over.
-  const humanTurn = !dice && !question && isHumanTurn(state, HUMAN);
+  const humanTurn = tossDone && !dice && !question && isHumanTurn(state, HUMAN);
   // activeRobot looks at a copy of the state; take the real robot so identity checks hold.
   const turnRobot = humanTurn ? robotById(state, activeRobot(state)!.id) : undefined;
   const autoAction =
@@ -126,7 +130,7 @@ export function MatchScreen() {
   // The AI's turns, ball landings and autopilot turns play out on their own, each once the pitch has finished
   // showing the last one and any dice moment is over.
   useEffect(() => {
-    if (state.over || question || dice) return;
+    if (!tossDone || state.over || question || dice) return;
     if (isHumanTurn(state, HUMAN) && !autoAction) return;
     // Off-ball turns (autopilot, or an AI robot while someone holds the ball) don't wait for other runs to finish.
     const next = activeRobot(state);
@@ -147,10 +151,19 @@ export function MatchScreen() {
     const next = Date.now() % 1_000_000;
     setSeed(next);
     setState(createMatch({ seed: next }));
+    setToss(null);
+    setTossDone(false);
     setAnswers([]);
     setHeld(undefined);
     setQuestion(null);
     setDice(null);
+  }
+
+  function callToss(call: Coin) {
+    const landed: Coin = Math.random() < 0.5 ? 'heads' : 'tails';
+    const won = landed === call;
+    setToss({ call, landed, won });
+    setState(createMatch({ seed, kickoff: won ? HUMAN : 'away', coinToss: true }));
   }
 
   const me = !autoAction ? turnRobot : undefined;
@@ -390,6 +403,33 @@ export function MatchScreen() {
                 {c}
               </button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {!tossDone && (
+        <div className="modal">
+          <div className="card coin-card">
+            <p className="big">Coin toss</p>
+            <div className={`coin ${toss ? `flip-${toss.landed}` : ''}`} aria-hidden="true">
+              <span className="coin-face heads">H</span>
+              <span className="coin-face tails">T</span>
+            </div>
+            {!toss ? (
+              <>
+                <p>Call it. The winner kicks off.</p>
+                <button onClick={() => callToss('heads')}>Heads</button>
+                <button onClick={() => callToss('tails')}>Tails</button>
+              </>
+            ) : (
+              <>
+                <p className="coin-result">
+                  {toss.landed === 'heads' ? 'Heads' : 'Tails'}!{' '}
+                  {toss.won ? 'You win the toss: Emberforge kick off.' : 'Tidewell win the toss and kick off.'}
+                </p>
+                <button onClick={() => setTossDone(true)}>Kick off</button>
+              </>
+            )}
           </div>
         </div>
       )}

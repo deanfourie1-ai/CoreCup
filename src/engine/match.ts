@@ -132,8 +132,20 @@ export function reachable(s: MatchState, r: Robot, steps: number): Map<string, H
 // ---------------------------------------------------------------------------
 // Turn order
 
+/** The kick-off taker while it still has its first action to take. */
+function kickoffTaker(s: MatchState): Robot | undefined {
+  return s.kickoff && !s.kickoff.acted ? robotById(s, s.kickoff.taker) : undefined;
+}
+
+/** Is kick-off protection still on (the taker has not moved, passed or shot yet)? */
+export function kickoffProtected(s: MatchState): boolean {
+  return !!s.kickoff && s.ball.state === 'held' && s.ball.by === s.kickoff.taker;
+}
+
 /** Picks who acts at the lowest tick. Mutates the tie flip when it decides. */
 function nextRobot(s: MatchState, tick: number): Robot {
+  const taker = kickoffTaker(s);
+  if (taker) return taker;
   let best = s.robots.filter((r) => r.tick === tick);
   const topSpeed = Math.max(...best.map((r) => r.stats.speed));
   best = best.filter((r) => r.stats.speed === topSpeed);
@@ -160,6 +172,8 @@ export function peekNext(
     if (f.landTick <= minTick || minTick >= boundary) return { kind: 'landing', tick: f.landTick };
   }
   if (minTick >= boundary) return { kind: 'whistle' };
+  // Kick-off: the taker acts first, now, whatever the track says.
+  if (kickoffTaker(s)) return { kind: 'robot', tick: s.clock };
   return { kind: 'robot', tick: minTick };
 }
 
@@ -200,7 +214,17 @@ export function legalActions(s: MatchState, robotId: string): Action[] {
     }
   }
   out.push({ type: 'hold', robot: r.id });
+  if (kickoffProtected(s) && holder && holder.team !== r.team) return out.filter((a) => respectsKickoff(r, holder, a));
   return out;
+}
+
+/** Kick-off protection: an opponent may not tackle, step into the kicking team's half, or come within 2 hexes. */
+function respectsKickoff(r: Robot, holder: Robot, a: Action): boolean {
+  if (a.type === 'tackle') return false;
+  if (a.type !== 'move' && a.type !== 'sprint') return true;
+  const half = Math.floor(lastCol(a.to.row) / 2);
+  const ownHalf = attacksEast(r.team) ? a.to.col <= half : a.to.col >= lastCol(a.to.row) - half;
+  return ownHalf && distance(a.to, holder.pos) >= 2;
 }
 
 function touchesPath(pos: Hex, path: Hex[]): boolean {
@@ -290,6 +314,11 @@ function offerReaction(ctx: Ctx, r: Robot, kind: ReactionKind): boolean {
 function perform(ctx: Ctx, a: Action): void {
   const { s } = ctx;
   const r = robotById(s, a.robot);
+  if (s.kickoff && s.kickoff.taker === r.id) {
+    s.kickoff.acted = true;
+    // Protection ends once the taker moves, passes or shoots.
+    if (a.type !== 'hold') s.kickoff = null;
+  }
   s.log.push({ t: 'action', tick: s.clock, action: a });
   switch (a.type) {
     case 'move':
@@ -570,6 +599,8 @@ export function step(state: MatchState, controllers: Controllers, rng?: Rng): Ma
         s.half = 2;
         s.clock = RULES.halfLength;
         s.log.push({ t: 'halftime' });
+        // A fresh half: every ability is available again, so it pays to use one before the break.
+        for (const r of s.robots) r.overheatUntil = null;
         resetForKickoff(s, otherTeam(s.firstKickoff));
       } else {
         s.over = true;

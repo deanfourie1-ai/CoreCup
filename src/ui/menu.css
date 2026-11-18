@@ -344,6 +344,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.mm-player .mm-num {
+  color: var(--mm-pink);
+}
 .mm-player small {
   color: var(--mm-quiet);
   font-size: 12px;

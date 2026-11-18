@@ -1,5 +1,5 @@
 // Sprite lab: the Round 1 vertical slice for the 2D anime sprite pipeline.
-// Playmaker #10 on the 13x9 hex pitch with idle / run / shot, a separate ball,
+// Kitsune (#10) on the 13x9 hex pitch with idle / run / shot, a separate ball,
 // a selection ring, click-to-move, visible layered gear, and the checks the
 // brief asks for (64 px legibility, six facings, ten sprites).
 
@@ -333,7 +333,7 @@ function syncGearUi() {
     const on = selected.loadout[b.dataset.slot as keyof Loadout] === Number(b.dataset.tier);
     b.setAttribute('aria-pressed', String(on));
   }
-  document.getElementById('selected-name')!.textContent = selected === hero ? '#10 Playmaker' : 'Crowd test copy';
+  document.getElementById('selected-name')!.textContent = selected === hero ? '#10 Kitsune' : 'Crowd test copy';
 }
 
 // In-place preview of any action in any facing.

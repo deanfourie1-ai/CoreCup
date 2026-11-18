@@ -18,7 +18,7 @@ code or rules.
 | Topic | Fit |
 | --- | --- |
 | Anime look, robot tells (ear comms, cheek mark, joint modules, chest emblem) | Matches the sprite brief; good reference for the Round 1 character sheet. |
-| Kitsune sheet | Female, red ponytail, Emberforge kit, midfielder: very likely the same person as playmaker #10. |
+| Kitsune sheet | Female, red ponytail, Emberforge kit, midfielder: the same person as playmaker #10, now named Kitsune (2026-11-18). |
 | Phoenix and Golem sheets | Match the sprite brief's #9 striker (Kai Rivet look) and silver-haired #1 keeper. |
 | Spirit creatures and FX studies | Direct reference for the Ascended aura layer (`aura` in the layer stack), replacing the generic wings with one creature per core. |
 | "Gear progression" panels | Show chest, shoulder, knee and boot changes per **core tier**. Our system keeps six gear slots (Mk I-III) separate from core tier. Recommend using these panels as the look of the **core** slot only. |

@@ -12,7 +12,7 @@ export interface CharacterArt {
 
 /** Keyed by the player's creature core, which is unique per character. */
 export const CHARACTER_ART: Record<string, CharacterArt> = {
-  // Emberforge #10 playmaker: approved six-direction run (PR 11); idle is the earlier SE draft.
+  // Kitsune, Emberforge #10 playmaker: approved six-direction run (PR 11); idle is the earlier SE draft.
   Kitsune: { atlas: `${SPRITES}kitsune10_run/cc_kitsune10.json` },
   // Hollis Stonewright, Emberforge keeper: approved idle + run in six directions and the keeper ready stance.
   Golem: { atlas: `${SPRITES}hollis/cc_hollis.json`, keeperStance: true },

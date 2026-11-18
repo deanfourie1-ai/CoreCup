@@ -107,7 +107,10 @@ export function MainMenu({ onKickOff }: { onKickOff: () => void }) {
                   <span className="mm-pos">{ROLE_SHORT[p.role]}</span>
                 </div>
                 <figcaption>
-                  <strong>{p.name}</strong>
+                  <strong>
+                    {p.number !== undefined && <span className="mm-num">#{p.number} </span>}
+                    {p.name}
+                  </strong>
                   <small>{p.core} core</small>
                 </figcaption>
               </figure>

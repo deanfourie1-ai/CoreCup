@@ -9,7 +9,7 @@ These are copies; nothing original was moved or deleted. The in-game sprite fram
 | Emberforge | Kitsune #10 | Team brief Part B + design-agent job 5 + delivery spec | boards-v1 board | No brief of her own (spread over 3 docs) |
 | Emberforge | Hollis Stonewright | Team brief Part A | boards-v1 board | No brief of his own |
 | Emberforge | Lan Shuyi | Team brief Part A + design-agent jobs 3-4 | boards-v1 board | No brief of her own |
-| Emberforge | Kweku Thread | kweku-art-brief.md | kweku-full-body-reference.png (official 2026-11-18) | None. Note design-agent-brief job 1 still points at his older board look |
+| Emberforge | Kweku Thread | kweku-art-brief.md + design-agent job 1 | kweku-full-body-reference.png (official 2026-11-18) | None. |
 | Emberforge | Iggy Vale | Team brief Part A + design-agent job 2 | boards-v1 board | No brief of his own, no in-game art yet |
 | Tidewell | Old Xuan, Brin Tolland, Sora Fennick, Niamh Brack, Tauro Kastellan | Shared Tidewell concept brief | boards-v1 boards (PLACEHOLDER portraits) | No real character art yet; looks + kit await Déan's OK; Old Xuan (Black Tortoise) and Tauro (Minotaur) have no creature-core sheet |
 

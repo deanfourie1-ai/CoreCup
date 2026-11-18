@@ -21,7 +21,7 @@ Iggy's phoenix crest is already done and on his board (boards/iggy_vale_palette_
 
 | # | Job | Frames | Guide | Match this |
 | --- | --- | --- | --- | --- |
-| 1 | Kweku SE idle + run | 4 + 8 | guides/kweku-se-guide.png | boards/kweku_thread_palette_reference.png; head top ~305 px |
+| 1 | Kweku SE idle + run | 4 + 8 | guides/kweku-se-guide.png | **kweku-full-body-reference.png** (his official look, approved 2026-11-18) and kweku-art-brief.md; use his board only for side/back angles; head top ~305 px |
 | 2 | Iggy SE idle + run | 4 + 8 | guides/iggy-se-guide.png | boards/iggy_vale_palette_reference.png; head top ~315 px; keep his red-orange hair streaks |
 | 3 | Lan NE run | 8 | guides/lan-ne-run-guide.png | her approved NE idle; back three-quarter, ribbon and long hair visible |
 | 4 | Lan NW idle + run | 4 + 8 | guides/lan-nw-guide.png | her approved W and NE idles; back three-quarter, moving up-left |

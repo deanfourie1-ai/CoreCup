@@ -5,6 +5,7 @@ Backup made 2026-11-18. Copies only; the originals are untouched.
 | Status | File | What it is | Copied from |
 | --- | --- | --- | --- |
 | CURRENT | `brief/kweku-art-brief.md` | his own brief (uses the full-body reference) | `emberforge-team-package/design-agent/kweku-art-brief.md` |
+| CURRENT | `brief/design-agent-brief.md` | Job 1 = Kweku SE idle + run (points at the full-body reference) | `emberforge-team-package/design-agent/design-agent-brief.md` |
 | SUPPORTING | `brief/emberforge-team-art-brief.md` | Part A (pass move, ability), older team brief | `emberforge-team-brief/emberforge-team-art-brief.md` |
 | CURRENT | `reference/kweku-full-body-reference.png` | OFFICIAL LOOK (Déan, 2026-11-18); overrides the boards where they differ | `emberforge-team-package/design-agent/kweku-full-body-reference.png` |
 | SUPPORTING | `reference/kweku-thread-board.png` | board v1: use only for side/back angles | `emberforge-team-package/boards-v1/kweku-thread-board.png` |

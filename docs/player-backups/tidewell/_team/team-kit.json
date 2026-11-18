@@ -1,0 +1,15 @@
+{
+ "club": "Tidewell Mariners",
+ "status": "kit proposed by Claude 2026-11-17; player looks are proposals until concept sheets are approved",
+ "kit": {"jersey": "#14304A", "trim_teal": "#2A8A9A", "light_seafoam": "#8FE3DA", "shorts": "#E8EEF2", "socks": "#14304A", "sock_bands": "#2A8A9A",
+         "metal_silver": "#C9D3DA", "chest_core": "#5FE0FF", "gloves": "#1B2838", "boots": "#1B2838",
+         "rules": ["silver (not gold) shoulder pads, knee guards and cuffs", "white shorts so Tidewell reads clearly against Emberforge's black shorts", "two thin teal sock bands"]},
+ "keeper_kit": {"jersey": "#1F5A52", "trim": "#C9D3DA", "light": "#B9F0E4", "shorts": "#14304A"},
+ "players": [
+  {"name": "Old Xuan", "role": "Keeper", "core": "Black Tortoise", "ability": "Shell Guard", "ability_colour": "#7A9A6A", "proposed_look": "veteran keeper, grey topknot and short beard", "hair": "#B8B4AC", "skin": "#C98E62", "board": "boards-v1/old-xuan-board.png"},
+  {"name": "Brin Tolland", "role": "Defender", "core": "Kraken", "ability": "Tentacle Grab", "ability_colour": "#5FD0C8", "proposed_look": "big centre-back, copper buzz cut, freckles", "hair": "#8A4A2A", "skin": "#E9B48F", "board": "boards-v1/brin-tolland-board.png"},
+  {"name": "Sora Fennick", "role": "Midfielder", "core": "Fenrir", "ability": "Unchained Dash", "ability_colour": "#9FB8FF", "proposed_look": "quick runner, windswept silver-blue hair", "hair": "#AFC3D9", "skin": "#F2C9A8", "board": "boards-v1/sora-fennick-board.png"},
+  {"name": "Niamh Brack", "role": "Midfielder", "core": "Kelpie", "ability": "Undertow", "ability_colour": "#4FB3E8", "proposed_look": "playmaker, long dark sea-green waves, freckles", "hair": "#1F3A44", "skin": "#F6CBB0", "board": "boards-v1/niamh-brack-board.png"},
+  {"name": "Tauro Kastellan", "role": "Striker", "core": "Minotaur", "ability": "Labyrinth Charge", "ability_colour": "#E0603A", "proposed_look": "powerful striker, dark curls, horn-like hair clips", "hair": "#2B1D17", "skin": "#B97A52", "board": "boards-v1/tauro-kastellan-board.png"}
+ ]
+}

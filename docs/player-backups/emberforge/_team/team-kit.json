@@ -1,0 +1,76 @@
+{
+ "club": "Emberforge Foundry",
+ "kit": {
+  "jersey": "#66202E",
+  "trim_gold": "#D29445",
+  "highlight_gold": "#F6CF8A",
+  "shorts": "#2A2428",
+  "socks": "#742536",
+  "chest_core": "#FF9E24",
+  "gloves_outfield": "#252020",
+  "gloves_keeper": "#443737",
+  "rules": [
+   "two thin gold sock bands below the knee guard",
+   "gold shoulder pads, knee guards, wrist cuffs",
+   "approved sprites keep their colours; lock applies to new art"
+  ]
+ },
+ "players": [
+  {
+   "name": "Hollis Stonewright",
+   "role": "Keeper",
+   "core": "Golem",
+   "ability": "Stone Wall",
+   "hair": "#C7C8C6",
+   "skin": "#AE6E3F",
+   "ability_colour": "#FFB02E",
+   "board": "boards-v1/hollis-board.png",
+   "atlas": "public/sprites/hollis/cc_hollis.json"
+  },
+  {
+   "name": "Lan Shuyi",
+   "role": "Defender",
+   "core": "Qilin",
+   "ability": "Guardian Aura",
+   "hair": "#54312C",
+   "accent": "#B92F33",
+   "skin": "#F9C5A7",
+   "ability_colour": "#FFC84A",
+   "board": "boards-v1/lan-shuyi-board.png",
+   "atlas": "public/sprites/lan/cc_lan.json"
+  },
+  {
+   "name": "Kweku Thread",
+   "role": "Midfielder",
+   "core": "Anansi",
+   "ability": "Web Pass",
+   "hair": "#252020",
+   "skin": "#713B28",
+   "ability_colour": "#742399",
+   "board": "boards-v1/kweku-thread-board.png",
+   "atlas": null
+  },
+  {
+   "name": "Playmaker #10",
+   "role": "Midfielder",
+   "core": "Kitsune",
+   "ability": "Fox Mirage",
+   "hair": "#D42D30",
+   "skin": "#F9C299",
+   "ability_colour": "#FF6F9E",
+   "board": "boards-v1/kitsune-10-board.png",
+   "atlas": "public/sprites/kitsune10_run/cc_kitsune10.json"
+  },
+  {
+   "name": "Iggy Vale",
+   "role": "Striker",
+   "core": "Phoenix",
+   "ability": "Flame Shot",
+   "hair": "#532D21",
+   "skin": "#E4A578",
+   "ability_colour": "#D93F23",
+   "board": "boards-v1/iggy-vale-board.png",
+   "atlas": null
+  }
+ ]
+}

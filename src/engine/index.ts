@@ -36,3 +36,4 @@ export {
 export { ABILITIES, TIER_NAMES, abilityOf, abilityN, type AbilityDef, type CoreTier } from './abilities';
 export { abilityChoice } from './ability-ai';
 export { createSimpleAI, towards, keeperPlay } from './ai';
+export { createSmartAI, SMART, shotChance } from './smart-ai';

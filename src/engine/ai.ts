@@ -15,7 +15,7 @@ import {
   targetGoal,
 } from './match';
 import { createRng } from './rng';
-import type { Action, Controller, Corner, MatchState, Robot } from './types';
+import type { Action, Controller, Corner, MatchState, Robot, ShotKind } from './types';
 
 const CORNERS: Corner[] = ['left', 'centre', 'right'];
 
@@ -51,9 +51,10 @@ function withCarrier(s: MatchState, r: Robot, legal: Action[]): Action {
   const goal = targetGoal(r.team);
   const d = distance(r.pos, goal);
   const shoot = find(legal, 'shoot');
-  // A wall on the line: chip over it.
-  const walled = !!shotWallHex(s, r.team, r.pos, 'driven');
-  if (d <= 5 || r.effect?.kind === 'flame') return shoot.find((a) => a.kind === (walled ? 'chip' : d <= 3 ? 'placed' : 'driven'))!;
+  // A wall on the line: the first shot kind it doesn't stop (a chip always goes over).
+  const kindFor = (want: ShotKind): ShotKind =>
+    (([want, 'placed', 'chip'] as ShotKind[]).find((k) => !shotWallHex(s, r.team, r.pos, k)) ?? 'chip');
+  if (d <= 5 || r.effect?.kind === 'flame') return shoot.find((a) => a.kind === kindFor(d <= 3 ? 'placed' : 'driven'))!;
 
   const pressed = s.robots.some((o) => o.team !== r.team && distance(o.pos, r.pos) === 1);
   const options = s.robots
@@ -74,7 +75,7 @@ function withCarrier(s: MatchState, r: Robot, legal: Action[]): Action {
   const move = towards(r, legal, goal);
   if (move.type !== 'hold') return move;
   if (options.length) return passTo(options[0]);
-  return shoot.find((a) => a.kind === (walled ? 'chip' : 'driven'))!;
+  return shoot.find((a) => a.kind === kindFor('driven'))!;
 }
 
 export function keeperPlay(s: MatchState, r: Robot, legal: Action[]): Action {

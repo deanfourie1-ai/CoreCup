@@ -4,7 +4,7 @@ import {
   abilityOf,
   activeRobot,
   createMatch,
-  createSimpleAI,
+  createSmartAI,
   isOverheated,
   legalActions,
   robotById,
@@ -39,12 +39,16 @@ interface Settings {
   autopilot: boolean;
 }
 
-const DEFAULT_SETTINGS: Settings = { dice: 'dramatic', alwaysReact: false, autopilot: true };
+// Reactions fire on their own unless switched off (Déan, 2026-11-19).
+const DEFAULT_SETTINGS: Settings = { dice: 'dramatic', alwaysReact: true, autopilot: true };
 const SETTINGS_KEY = 'corecup.match.settings';
 
 function loadSettings(): Settings {
   try {
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}') };
+    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}');
+    // Settings saved before 2026-11-19 had "Ask me" as the default: move them onto the new default once.
+    if (saved.v !== 2) delete saved.alwaysReact;
+    return { ...DEFAULT_SETTINGS, ...saved };
   } catch {
     return DEFAULT_SETTINGS;
   }
@@ -75,7 +79,7 @@ const REACTION_WORDS = {
 
 export function MatchScreen() {
   const [seed, setSeed] = useState(() => Date.now() % 1_000_000);
-  const ai = useMemo(() => createSimpleAI(seed), [seed]);
+  const ai = useMemo(() => createSmartAI(seed), [seed]);
   const [state, setState] = useState<MatchState>(() => createMatch({ seed }));
   /** The coin toss before kick-off: null until called, then what the coin showed and who won. */
   const [toss, setToss] = useState<{ call: Coin; landed: Coin; won: boolean } | null>(null);
@@ -95,7 +99,7 @@ export function MatchScreen() {
     const next = { ...settings, ...patch };
     setSettings(next);
     try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...next, v: 2 }));
     } catch {
       // Private window or blocked storage: the setting still applies for this match.
     }

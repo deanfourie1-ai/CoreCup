@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { hexKey, type Hex } from './hex';
-import { ballHolder, isOverheated, legalActions, robotById, step, stoneWallHexes } from './match';
+import { ballHolder, isOverheated, legalActions, robotById, shotWallHex, step, stoneWallHexes } from './match';
 import type { Rng } from './rng';
 import { RULES } from './rules';
 import { createMatch } from './setup';
@@ -205,6 +205,23 @@ describe('Golem: Stone Wall', () => {
 
   it('builds 3 hexes across the goal mouth', () => {
     expect(stoneWallHexes('home', 3).map(hexKey)).toEqual(['1,3', '1,4', '1,5']);
+  });
+});
+
+describe('Black Tortoise: Shell Guard', () => {
+  it("does not stop shots on the keeper's own hex (the keeper saves there with its dice), only on the extra hex", () => {
+    const s = arena();
+    const tortoise = place(s, 'away-0', hex(12, 4), 10);
+    tortoise.effect = { kind: 'wall', hexes: [hex(12, 4), hex(11, 4)] };
+    place(s, 'home-4', hex(8, 4), 5);
+    // Straight down row 4: the line crosses the extra hex (11,4) first, so the shell stops it.
+    expect(shotWallHex(s, 'home', hex(8, 4), 'driven')).toEqual(hex(11, 4));
+    // With only the keeper's own hex in the shell, nothing stops the shot (the keeper still rolls to save it).
+    tortoise.effect = { kind: 'wall', hexes: [hex(12, 4)] };
+    expect(shotWallHex(s, 'home', hex(8, 4), 'driven')).toBeUndefined();
+    RULES.wallOwnHexStopsShots = true;
+    expect(shotWallHex(s, 'home', hex(8, 4), 'driven')).toEqual(hex(12, 4));
+    RULES.wallOwnHexStopsShots = false;
   });
 });
 

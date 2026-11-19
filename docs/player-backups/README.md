@@ -18,3 +18,5 @@ These are copies; nothing original was moved or deleted. The in-game sprite fram
 
 
 **Repo copy note:** to keep the repo small, this copy leaves out the creature-core concept sheets (`creature-sheet-*.png` and `_shared/`) and Kitsune's main-menu key art (the game already has it as `public/menu/key-art-kitsune.webp`). The full set is `player-backups/corecup-player-backups-2026-11-18.zip` in the project files; the original sheets are in `corecup-nine-creature-core-character-sheets.zip`.
+
+**Tidewell update 2026-11-19:** Déan's team reference board is in `tidewell/_team/tidewell-team-reference-board-2026-11-19.png`. It proposes a different roster (Seren Kelpie MF Kelpie, Cain Marrow DF Leviathan, Lira Finn FW Merrow, Orin Drake GK Siren, Maris Vell Utility Leviathan) from the placeholder player folders here. Which roster is current is awaiting Déan.

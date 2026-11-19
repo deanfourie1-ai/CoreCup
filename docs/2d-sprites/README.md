@@ -4,7 +4,7 @@ Status: **for review (Round 1 of the 2D sprite handoff brief). Round 2 has not s
 
 The player art pipeline moves from 3D humanoid models to hand-drawn 2D anime sprites in a fixed-camera
 2.5D view. Gameplay is unchanged: 5-a-side, 13x9 hex pitch, roles, abilities, six visible upgrade slots
-and Spark/Surge/Ascended cores. This folder covers the first slice: Emberforge playmaker #10 on the pitch.
+and Spark/Surge/Ascended cores. This folder covers the first slice: Emberforge playmaker #10, Kitsune, on the pitch.
 
 ## Run it
 

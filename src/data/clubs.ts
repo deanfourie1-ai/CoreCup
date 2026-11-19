@@ -13,6 +13,8 @@ export interface PlayerDef {
   name: string;
   role: Role;
   core: string;
+  /** Shirt number, when the player has a fixed one. */
+  number?: number;
   /** Leave out to use the role's starting stats. */
   stats?: PlayerStats;
   /** Core tier: 1 Spark (default), 2 Surge, 3 Ascended. */
@@ -45,8 +47,8 @@ export const CLUBS: ClubDef[] = [
       { name: 'Hollis Stonewright', role: 'Keeper', core: 'Golem' },
       { name: 'Lan Shuyi', role: 'Defender', core: 'Qilin' },
       { name: 'Kweku Thread', role: 'Midfielder', core: 'Anansi' },
-      // #10 playmaker from the 2D sprite work; her name is not chosen yet.
-      { name: 'Playmaker #10', role: 'Midfielder', core: 'Kitsune' },
+      // #10 playmaker: named Kitsune after her creature core (Déan, 2026-11-18).
+      { name: 'Kitsune', role: 'Midfielder', core: 'Kitsune', number: 10 },
       { name: 'Iggy Vale', role: 'Striker', core: 'Phoenix' },
     ],
   },

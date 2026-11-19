@@ -64,6 +64,15 @@ export const RULES = {
 
   /** Signature abilities on or off (the rules simulator compares both). */
   abilities: true,
+  /** Cores whose ability is switched off (the rules simulator measures each ability on its own). */
+  abilitiesOff: [] as string[],
+  /** Shot kinds a Stone Wall or Shell Guard stops dead (chips always go over). */
+  wallStopsShots: ['driven', 'placed'] as ('driven' | 'placed' | 'chip')[],
+  /**
+   * Does the wall robot's own hex stop shots? No (2026-11-19): the keeper standing there already saves with its
+   * own dice, and counting it as a wall too made Shell Guard the one ability that raised 0-0 draws (34% to 31%).
+   */
+  wallOwnHexStopsShots: false,
   /** Ticks an ability costs by core tier (Spark, Surge, Ascended), plus Overheat afterwards. */
   abilityCost: { 1: 8, 2: 7, 3: 6 } as Record<1 | 2 | 3, number>,
 };

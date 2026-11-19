@@ -652,11 +652,14 @@ export function wallAt(s: MatchState, team: TeamId, h: Hex): Robot | undefined {
 
 /** The first hex of the defending team's wall on a shot's line, if the shot is one a wall stops (not a chip). */
 export function shotWallHex(s: MatchState, shooting: TeamId, from: Hex, kind: ShotFlight['kind']): Hex | undefined {
-  if (kind === 'chip') return undefined;
+  if (!RULES.wallStopsShots.includes(kind)) return undefined;
   const defending = otherTeam(shooting);
   return line(from, targetGoal(shooting))
     .slice(1)
-    .find((h) => wallAt(s, defending, h));
+    .find((h) => {
+      const w = wallAt(s, defending, h);
+      return w && (RULES.wallOwnHexStopsShots || !sameHex(w.pos, h));
+    });
 }
 
 /**
@@ -770,7 +773,7 @@ export function chargeLines(s: MatchState, r: Robot, length: number, knocks: num
 /** The ability actions a robot has right now (none while overheated or with abilities switched off). */
 function abilityActions(s: MatchState, r: Robot): Action[] {
   const def = abilityOf(r.core);
-  if (!RULES.abilities || !def || isOverheated(r)) return [];
+  if (!RULES.abilities || !def || RULES.abilitiesOff.includes(r.core) || isOverheated(r)) return [];
   const n = (k: string) => abilityN(r.core, k, r.tier);
   const holder = ballHolder(s);
   const mine = holder === r;
